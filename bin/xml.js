@@ -75,6 +75,63 @@ const template =
     ]
 */
 
+function getLuaType(value) {
+    let type = "LUA_T"
+
+    switch (typeof value) {
+        case "undefined":
+        case "object": 
+            type += "NIL"
+            break
+        case "boolean":
+            type += "BOOLEAN"
+            break
+        case "number":
+        case "bigint":
+            type += "NUMBER"
+            break
+        case "string":
+        case "symbol":
+            type += "STRING"
+            break
+        default:
+            type += "NIL"
+            break
+    }
+
+    return type
+}
+
+function generateLuaArguments(arguments) {
+    let xml = ""
+
+    for (let argument of arguments) {
+        xml += generateLuaValueXml(argument)
+    }
+
+    return xml
+}
+
+function generateLuaValueXml(value) {
+    let xml = ""
+    xml += "<ns1:LuaValue>"
+
+    if (typeof value === "object" && value !== null) {
+        xml += `<ns1:type>LUA_TTABLE</ns1:type>`
+        xml += "<ns1:table>"
+        for (let key in value) {
+            xml += generateLuaValueXml(key)
+        }
+        xml += "</ns1:table>"
+    } else {
+        xml += `<ns1:type>${getLuaType(value)}</ns1:type>`
+        xml += `<ns1:value>${value}</ns1:value>`
+    }
+
+    xml += "</ns1:LuaValue>"
+    return xml
+}
+
 function generateOperationXml(operation) {
     let xml = ""
 
@@ -84,9 +141,9 @@ function generateOperationXml(operation) {
         let value = operation[key]
 
         if (typeof value === "object") {
-            xml += generateOperationXml(value)
+            xml += key == "arguments" ? generateLuaArguments(value) : generateOperationXml(value)
         } else {
-            xml += key == "arguments" ? generateLuaArgumentsXml(value) : value
+            xml += value
         }
 
         xml += `</ns1:${key}>`
