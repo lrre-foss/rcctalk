@@ -1,24 +1,17 @@
 #!/usr/bin/env node
 
 const { program } = require("commander")
-const xml = require("./xml")
+const app = require("../app")
 
 program
-    .option("-c, --connect <ip:port>", "connect to a RCCService instance")
+    .name("rcctalk")
+    .description("RCCService communication utility")
+    .version("1.0.0")
+
+program
+    .option("-c, --connect <ip>", "connect to a RCCService instance", "127.0.0.1")
+    .option("-o, --operations", "list all available operations")
 
 program.parse()
 
-console.log(xml.generateEnvelope([{"OpenJob": {
-    "job": {
-        "id": "",
-        "expirationInSeconds": 0,
-        "category": 0,
-        "cores": 0
-    },
-
-    "script": {
-        "name": "Starter Script",
-        "script": "print(\"Hello, world!\")",
-        "arguments": [1, 2, "three"]
-    }
-}}]))
+app.start(program.opts())
