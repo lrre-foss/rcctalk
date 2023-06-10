@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/kiseki-lol/rcctalk#readme",
   "dependencies": {
-    "commander": "^10.0.1"
+    "commander": "^10.0.1",
+    "fast-xml-parser": "^4.2.4"
   }
 }
