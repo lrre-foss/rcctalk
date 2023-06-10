@@ -2,9 +2,8 @@
   "name": "rcctalk",
   "version": "1.0.0",
   "description": "RCCService communication utility",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "multiply": "bin/index.js"
   },
   "repository": {
     "type": "git",
