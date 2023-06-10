@@ -2,6 +2,7 @@
   "name": "rcctalk",
   "version": "1.0.0",
   "description": "RCCService communication utility",
+  "type": "module",
   "bin": {
     "rcctalk": "bin/rcctalk.js"
   },
@@ -16,9 +17,10 @@
   },
   "homepage": "https://github.com/kiseki-lol/rcctalk#readme",
   "dependencies": {
-    "chalk": "^4.1.2",
+    "chalk": "^5.2.0",
     "commander": "^10.0.1",
     "fast-xml-parser": "^4.2.4",
-    "node-fetch": "^2.6.11"
+    "is-ip": "^5.0.0",
+    "node-fetch": "^3.3.1"
   }
 }

@@ -1,5 +1,6 @@
-const fetch = require("node-fetch")
-const xml = require("./xml")
+import fetch from "node-fetch"
+
+import xml from "./xml.js"
 
 function connect(ip, port = 64989) {
 
@@ -9,4 +10,4 @@ function send(envelope) {
 
 }
 
-module.exports = { connect, send }
+export default { connect, send }

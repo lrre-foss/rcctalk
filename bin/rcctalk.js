@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
-const { program } = require("commander")
-const app = require("../app")
+import { Command } from "commander"
+
+import app from "../app.js"
+
+const program = new Command()
 
 program
     .name("rcctalk")
@@ -10,7 +13,7 @@ program
 
 program
     .option("-c, --connect <ip>", "connect to a RCCService instance", "127.0.0.1")
-    .option("-o, --operations", "list all available operations")
+    .option("-o, --operations", "displays all available operations")
 
 program.parse()
 

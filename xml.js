@@ -1,4 +1,4 @@
-const { XMLParser } = require("fast-xml-parser")
+import { XMLParser, XMLValidator } from "fast-xml-parser"
 
 const template = 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
@@ -35,10 +35,10 @@ function getLuaType(value) {
     return type
 }
 
-function generateLuaArguments(arguments) {
+function generateLuaArguments(data) {
     let xml = ""
 
-    for (let argument of arguments) {
+    for (let argument of data) {
         xml += generateLuaValueXml(argument)
     }
 
@@ -95,4 +95,4 @@ function generateEnvelope(operations) {
     return template.replace("{{body}}", xml)
 }
 
-module.exports = { generateEnvelope }
+export default { generateEnvelope }
