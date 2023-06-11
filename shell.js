@@ -4,7 +4,11 @@ const commands = [
     {
         name: "connect",
         description: "connect to a RCCService instance",
-        parameters: ["ip"]
+        parameters: ["ip"],
+        handler: async (ip) => {
+            await connection.connect(ip)
+            console.log(`Connected to ${connection.getIp()}`)
+        }
     },
     {
         name: "disconnect",
@@ -13,11 +17,29 @@ const commands = [
     },
     {
         name: "version",
-        description: "output the version number of the connected RCCService instance"
+        description: "output the version number of the connected RCCService instance",
+        handler: async () => {
+            let result = await connection.send([{
+                "GetVersion": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(`Connected to RCCService version ${result}`)
+            }
+        }
     },
     {
         name: "ping",
-        description: "pings the connected RCCService instance"
+        description: "pings the connected RCCService instance",
+        handler: async () => {
+            let result = await connection.send([{
+                "HelloWorld": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(`Pong! (RCCService returned "${result}" in ${time}ms)`)
+            }
+        }
     },
     {
         name: "help",
@@ -33,7 +55,10 @@ const commands = [
     },
     {
         name: "exit",
-        description: "closes rcctalk"
+        description: "closes rcctalk",
+        handler: () => {
+            process.exit(0)
+        }
     }
 ]
 
