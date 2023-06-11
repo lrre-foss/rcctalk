@@ -1,5 +1,7 @@
+import readline from "readline"
 import chalk from "chalk"
 
+import app from "./app.js"
 import connection from "./connection.js"
 
 // Quickly access chalk functions @_@
@@ -14,6 +16,14 @@ const c = {
     gr: chalk.grey
 }
 
+const logo = "              _        _ _    " +
+      "\n" + "             | |      | | |   " +
+      "\n" + " _ __ ___ ___| |_ __ _| | | __" +
+      "\n" + "| '__/ __/ __| __/ _` | | |/ /" +
+      "\n" + "| | | (_| (__| || (_| | |   < " +
+      "\n" + "|_|  \\___\\___|\\__\\__,_|_|_|\\_\\"
+const colorIndex = 13
+
 const commands = {
     "connect": {
         description: "connect to a RCCService instance",
@@ -21,6 +31,7 @@ const commands = {
         handler: async (ip) => {
             await connection.connect(ip)
             console.log(`Connected to ${connection.getIp()}`)
+            io.setPrompt(c.y(connection.getIp()))
         }
     },
     "disconnect": {
@@ -99,7 +110,7 @@ const commands = {
                             process.stdout.write(`${c.r(parameter.type)}${c.m("?")} ${c.w(name)}`)
 
                             if (parameter.hasOwnProperty("default")) {
-                                process.stdout.write(` = ${c.c(typeof parameter.default === "object" ? "[]" : parameter.default)}`)
+                                process.stdout.write(` = ${typeof parameter.default === "object" ? c.w("[]") : c.c(parameter.default)}`)
                             }
                         }
 
@@ -130,7 +141,7 @@ const commands = {
                 // Parameters
                 if (command.hasOwnProperty("parameters")) {
                     for (let parameter of command.parameters) {
-                        process.stdout.write(` <${c.w(parameter)}>`)
+                        process.stdout.write(` <${c.m(parameter)}>`)
                     }
                 }
 
@@ -313,4 +324,40 @@ const operations = {
     }
 }
 
-export default {}
+var io = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: "> "
+})
+
+function startup() {
+    let lines = logo.split("\n")
+    for (let line of lines) {
+        console.log(c.r(line.slice(0, colorIndex)) + c.w(line.slice(colorIndex)))
+    }
+
+    console.log(`version ${app.version}\n`)
+    console.log(`Type ${c.y("help")} to get started`)
+}
+
+async function open(options) {
+    startup()
+
+    if (options.hasOwnProperty("connect")) {
+        await commands.connect.handler(options.connect)
+    }
+
+    feed()
+}
+
+function feed() {
+    io.question("> ", async (input) => {
+        if (input == "help") {
+            commands.help.handler()
+        }
+
+        feed()
+    })
+}
+
+export default { open }
