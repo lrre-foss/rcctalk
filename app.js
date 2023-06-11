@@ -1,6 +1,6 @@
 import chalk from "chalk"
 
-import soap from "./soap.js"
+import shell from "./shell.js"
 
 const version = "1.0.0"
 const logo = "              _        _ _    " +
