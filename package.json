@@ -1,5 +1,5 @@
 {
-  "name": "rcctalk",
+  "name": "@kiseki-lol/rcctalk",
   "version": "1.0.0",
   "description": "RCCService communication utility",
   "type": "module",
@@ -10,7 +10,13 @@
     "type": "git",
     "url": "git+https://github.com/kiseki-lol/rcctalk.git"
   },
-  "author": "Kiseki",
+  "contributors": [
+    {
+      "name": "rjindael",
+      "email": "me@rjindael.xyz",
+      "url": "https://rjindael.xyz/"
+    } 
+  ],
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/kiseki-lol/rcctalk/issues"
