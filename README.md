@@ -1,5 +1,5 @@
 # rcctalk
-RCCService communication utility
+Powerful command line utility to communicate with RCCService instances
 
 # Screenshot
 ![](https://github.com/kiseki-lol/rcctalk/raw/trunk/screenshot.png)
