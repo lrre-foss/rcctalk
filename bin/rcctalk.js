@@ -9,11 +9,10 @@ const program = new Command()
 program
     .name("rcctalk")
     .description("RCCService communication utility")
-    .version("1.0.0")
+    .version(app.version)
 
 program
-    .option("-c, --connect <ip>", "connect to a RCCService instance", "127.0.0.1")
-    .option("-o, --operations", "displays all available operations")
+    .option("-c, --connect <ip>", "connect to a RCCService instance")
 
 program.parse()
 
