@@ -65,8 +65,9 @@ const commands = {
     "help": {
         description: "displays all available operations and commands",
         handler: () => {
-            commands.operations.handler()
             commands.commands.handler()
+            console.log()
+            commands.operations.handler()
         }
     },
     "operations": {
@@ -123,8 +124,6 @@ const commands = {
                     }
                 }
             }
-
-            console.log()
         }
     },
     "commands": {
@@ -141,15 +140,13 @@ const commands = {
                 // Parameters
                 if (command.hasOwnProperty("parameters")) {
                     for (let parameter of command.parameters) {
-                        process.stdout.write(` <${c.m(parameter)}>`)
+                        process.stdout.write(` ${c.m(`<${parameter}>`)}`)
                     }
                 }
 
                 // Command description
                 console.log(` - ${command.description}`)
             }
-
-            console.log()
         }
     },
     "exit": {
