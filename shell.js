@@ -1,8 +1,9 @@
+import chalk from "chalk"
+
 import connection from "./connection.js"
 
-const commands = [
-    {
-        name: "connect",
+const commands = {
+    "connect": {
         description: "connect to a RCCService instance",
         parameters: ["ip"],
         handler: async (ip) => {
@@ -10,13 +11,11 @@ const commands = [
             console.log(`Connected to ${connection.getIp()}`)
         }
     },
-    {
-        name: "disconnect",
+    "disconnect": {
         description: "disconnects from the connected RCCService instance",
         handler: connection.disconnect
     },
-    {
-        name: "version",
+    "version": {
         description: "output the version number of the connected RCCService instance",
         handler: async () => {
             let result = await connection.send([{
@@ -28,8 +27,7 @@ const commands = [
             }
         }
     },
-    {
-        name: "ping",
+    "ping": {
         description: "pings the connected RCCService instance",
         handler: async () => {
             let result = await connection.send([{
@@ -41,25 +39,39 @@ const commands = [
             }
         }
     },
-    {
-        name: "help",
-        description: "displays this help message"
+    "help": {
+        description: "displays all available operations and commands",
+        handler: () => {
+            commands.operations.handler()
+            commands.commands.handler()
+        }
     },
-    {
-        name: "operations",
-        description: "displays all available operations"
+    "operations": {
+        description: "displays all available operations",
+        handler: () => {
+
+        }
     },
-    {
-        name: "commands",
-        description: "displays all available commands"
+    "commands": {
+        description: "displays all available commands",
+        handler: () => {
+            console.log(chalk.whiteBright("Available commands:"))
+            for (let command in commands) {
+                console.log(`${chalk.grey("-")} ${chalk.whiteBright(command)}`)
+                for (let parameter of commands[command].parameters) {
+                    console.log(` ${chalk.whiteBright(parameter)}`)
+                }
+
+                console.log(` - ${commands[command].description}`)
+            }
+        }
     },
-    {
-        name: "exit",
+    "exit": {
         description: "closes rcctalk",
         handler: () => {
             process.exit(0)
         }
     }
-]
+}
 
 const operations = []
