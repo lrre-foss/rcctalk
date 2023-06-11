@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-import soap from "./soap.js"
+import xml from "./xml.js"
 
 async function connect(ip) {
 
