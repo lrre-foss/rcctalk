@@ -15,7 +15,7 @@
       "name": "rjindael",
       "email": "me@rjindael.xyz",
       "url": "https://rjindael.xyz/"
-    } 
+    }
   ],
   "license": "UNLICENSED",
   "bugs": {
@@ -27,6 +27,7 @@
     "commander": "^10.0.1",
     "fast-xml-parser": "^4.2.4",
     "is-ip": "^5.0.0",
+    "json-colorizer": "^2.2.2",
     "node-fetch": "^3.3.1"
   }
 }

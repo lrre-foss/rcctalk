@@ -1,5 +1,7 @@
-import readline from "readline"
+import fs from "node:fs"
+import readline from "node:readline"
 import chalk from "chalk"
+import colorize from "json-colorizer"
 
 import app from "./app.js"
 import connection from "./connection.js"
@@ -36,29 +38,32 @@ const commands = {
     },
     "disconnect": {
         description: "disconnects from the connected RCCService instance",
-        handler: connection.disconnect
+        handler: () => {
+            connection.disconnect()
+            io.setPrompt("")
+        }
     },
     "version": {
         description: "prints the version number of the connected RCCService instance",
         handler: async () => {
-            let result = await connection.send([{
+            let response = await connection.send([{
                 "GetVersion": {}
             }])
 
             if (!connection.fault()) {
-                console.log(`Connected to RCCService version ${result}`)
+                console.log(`Connected to RCCService version ${response}`)
             }
         }
     },
     "ping": {
         description: "pings the connected RCCService instance",
         handler: async () => {
-            let result = await connection.send([{
+            let response = await connection.send([{
                 "HelloWorld": {}
             }])
 
             if (!connection.fault()) {
-                console.log(`Pong! (RCCService returned "${result}" in ${time}ms)`)
+                console.log(`Pong! (RCCService returned "${response}" in ${time}ms)`)
             }
         }
     },
@@ -167,14 +172,41 @@ const commands = {
 const operations = {
     "HelloWorld": {
         returns: "string",
+        handler: async () => {
+            let response = await connection.send([{
+                "HelloWorld": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(response)
+            }
+        }
     },
     "GetVersion": {
         returns: "string",
+        handler: async () => {
+            let response = await connection.send([{
+                "GetVersion": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(response)
+            }
+        }
     },
     "GetStatus": {
         returns: {
             userdata: true,
             type: "Status",
+        },
+        handler: async () => {
+            let response = await connection.send([{
+                "Status": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(colorize(response, { pretty: true }))
+            }
         }
     },
     "OpenJob": {
@@ -212,6 +244,32 @@ const operations = {
                 default: []
             }
         },
+        handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
+            if (script == basename(script) && fs.existsSync(script)) {
+                script = fs.readFileSync(script, "utf8")
+            }
+
+            let response = await connection.send([{
+                "OpenJob": {
+                    "job": {
+                        "id": jobID,
+                        "expirationInSeconds": expirationInSeconds,
+                        "category": category,
+                        "cores": cores
+                    },
+                    
+                    "script": {
+                        "name": "Starter Script",
+                        "script": script,
+                        "arguments": data
+                    }
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(colorize(response, { pretty: true }))
+            }
+        }
     },
     "RenewLease": {
         returns: "double",
@@ -223,6 +281,18 @@ const operations = {
             "expirationInSeconds": {
                 type: "double",
                 required: true
+            }
+        },
+        handler: async (jobID, expirationInSeconds) => {
+            let response = await connection.send([{
+                "RenewLease": {
+                    "jobID": jobID,
+                    "expirationInSeconds": expirationInSeconds
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(response)
             }
         }
     },
@@ -245,6 +315,26 @@ const operations = {
                 required: false,
                 default: []
             }
+        },
+        handler: async (jobID, script, data) => {
+            if (script == basename(script) && fs.existsSync(script)) {
+                script = fs.readFileSync(script, "utf8")
+            }
+
+            let response = await connection.send([{
+                "Execute": {
+                    "jobID": jobID,
+                    "script": {
+                        "name": "Starter Script",
+                        "script": script,
+                        "arguments": data
+                    }
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(colorize(response, { pretty: true }))
+            }
         }
     },
     "CloseJob": {
@@ -254,6 +344,17 @@ const operations = {
                 type: "string",
                 required: true
             },
+        },
+        handler: async (jobID) => {
+            await connection.send([{
+                "CloseJob": {
+                    "jobID": jobID
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(`Successfully closed job with ID "${jobID}"`)
+            }
         }
     },
     "BatchJob": {
@@ -291,6 +392,32 @@ const operations = {
                 default: []
             }
         },
+        handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
+            if (script == basename(script) && fs.existsSync(script)) {
+                script = fs.readFileSync(script, "utf8")
+            }
+
+            let response = await connection.send([{
+                "OpenJob": {
+                    "job": {
+                        "id": jobID,
+                        "expirationInSeconds": expirationInSeconds,
+                        "category": category,
+                        "cores": cores
+                    },
+                    
+                    "script": {
+                        "name": "Starter Script",
+                        "script": script,
+                        "arguments": data
+                    }
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(colorize(response, { pretty: true }))
+            }
+        }
     },
     "GetExpiration": {
         returns: "double",
@@ -299,16 +426,45 @@ const operations = {
                 type: "string",
                 required: true
             },
+        },
+        handler: async () => {
+            let response = await connection.send([{
+                "GetExpiration": {
+                    "jobID": jobID
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(response)
+            }
         }
     },
     "GetAllJobs": {
         returns: {
             userdata: true,
             type: "Job[]"
+        },
+        handler: async () => {
+            let response = await connection.send([{
+                "GetAllJobs": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(colorize(response, { pretty: true }))
+            }
         }
     },
     "CloseExpiredJobs": {
-        returns: "int"
+        returns: "int",
+        handler: async () => {
+            let response = await connection.send([{
+                "CloseExpiredJobs": {}
+            }])
+
+            if (!connection.fault()) {
+                console.log(response)
+            }
+        }
     },
     "Diag": {
         returns: {
@@ -323,6 +479,18 @@ const operations = {
             "jobID": {
                 type: "string",
                 required: false
+            }
+        },
+        handler: async (type, jobID) => {
+            let response = await connection.send([{
+                "Diag": {
+                    "type": type,
+                    "jobID": jobID
+                }
+            }])
+
+            if (!connection.fault()) {
+                console.log(colorize(response, { pretty: true }))
             }
         }
     }
