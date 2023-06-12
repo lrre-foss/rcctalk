@@ -60,7 +60,7 @@ const commands = {
     "version": {
         description: "prints the version number of the connected RCCService instance",
         handler: async () => {
-            if (!soap.connected()) {
+            if (!soap.isConnected()) {
                 console.log(`${c.r("You are not connected to a RCCService instance!")}`)
                 return
             }
@@ -77,11 +77,11 @@ const commands = {
     "ping": {
         description: "pings the connected RCCService instance",
         handler: async () => {
-            if (!soap.connected()) {
+            if (!soap.isConnected()) {
                 console.log(`${c.r("You are not connected to a RCCService instance!")}`)
                 return
             }
-            
+
             let start = Date.now()
             let response = await soap.send([{
                 "HelloWorld": {}
@@ -553,7 +553,7 @@ async function open(options) {
 }
 
 async function feed() {
-    io.question(`${soap.connected() ? "" : c.y(soap.getFormattedIP())}> `, async (input) => {
+    io.question(`${soap.isConnected() ? "" : c.y(soap.getFormattedIP())}> `, async (input) => {
         if (input == "help") {
             commands.help.handler()
         } else if (input == "exit") {
