@@ -31,7 +31,7 @@ const colorIndex = 13
 
 const commands = {
     "connect": {
-        description: "connect to a RCCService instance",
+        description: "connect to a RCCService instance at the specified IP address (default port: 64989)",
         parameters: ["ip"],
         handler: async (ip) => {
             soap.disconnect()
@@ -62,7 +62,7 @@ const commands = {
                 spinner.suffixText = `Connected! (took ${c.g(elapsed + "ms")})`
             }
 
-            io.setPrompt(c.y(soap.getIp()))
+            io.setPrompt(c.y(soap.getIP()))
         }
     },
     "disconnect": {

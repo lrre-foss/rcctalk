@@ -12,7 +12,7 @@ program
     .version(app.version)
 
 program
-    .option("-c, --connect <ip>", "connect to a RCCService instance")
+    .option("-c, --connect <ip>", "connect to a RCCService instance at the specified IP address (default port: 64989)")
 
 program.parse()
 
