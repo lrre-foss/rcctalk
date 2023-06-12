@@ -1,5 +1,4 @@
 import { XMLParser } from "fast-xml-parser"
-import colorize from "json-colorizer"
 import xmlFormat from "xml-formatter"
 
 const template = 
