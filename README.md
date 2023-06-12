@@ -17,7 +17,7 @@ Optional arguments are denoted with a question mark and don't always have to be 
 ## Eval
 rcctalk uses JavaScript's inbuilt `eval` function to parse operation parameters, allowing you to take advantage of JavaScript functions and utilize mathematical operators to achieve even more powerful access to RCCService. Here are some examples:
 - `Execute("sampleJobId123", "return " + Math.pow(6, 2))` -> Will return `36`
-- `Execute("sampleJobId123", fs.ReadFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
+- `Execute("sampleJobId123", fs.readFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
 
 # License
 Copyright (c) Kiseki 2023. All rights reserved.
