@@ -4,6 +4,7 @@ import readline from "node:readline"
 import chalk from "chalk"
 import colorize from "json-colorizer"
 import ora from "ora"
+import { v4 as uuid } from "uuid"
 
 import app from "./app.js"
 import soap from "./soap.js"
@@ -356,7 +357,7 @@ const operations = {
                 "Execute": {
                     "jobID": jobID,
                     "script": {
-                        "name": "Starter Script",
+                        "name": uuid(),
                         "script": script,
                         "arguments": data
                     }

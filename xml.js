@@ -160,7 +160,9 @@ function parseEnvelope(envelope) {
     }
 
     body = Object.values(body)[0]
+
     let type = Object.keys(body)[0].split(":")[1].replace("Result", "")
+    
     if (type == "OpenJob" || type == "Execute" || type == "BatchJob" || type == "Diag") {
         // This is a LuaValue[]
         body = parseLuaValueXml(Object.values(body)[0])
