@@ -10,10 +10,14 @@ rcctalk is a console application that can be installed by cloning the repository
 ## Example operations
 - `OpenJob("sampleJobId123", "return 'Hello world!'")` -> Opens a job and returns `Hello world!`
 - `CloseAllJobs()` -> Closes every job on the connected RCCService instance
-- `OpenJob("sampleJobId123", 5000, "c:/gameserver.lua", [53640])` -> Opens a job with an expiration of 5000 seconds and passes 53640 as an argument to a script on your computer located at `c:/gameserver.lua`
-- `Execute("sampleJobId123", "return a", ["hi there!"])` -> Will return `hi there`, assuming a job with ID `sampleJob123` exists
+- `Execute("sampleJobId123", "local a, b = ...; return b .. a;", ["spaghetti", "cook"])` -> Will return `cook spaghetti` assuming a job with ID `sampleJobId123` exists
 
 Optional arguments are denoted with a question mark and don't always have to be set, but if there are multiple optional arguments in a sequence then they must be inputted according to their order denoted in the help menu.
+
+## Eval
+rcctalk uses JavaScript's inbuilt `eval` function to parse operation parameters, allowing you to take advantage of JavaScript functions and utilize mathematical operators to achieve even more powerful access to RCCService. Here are some examples:
+- `Execute("sampleJobId123", "return " + Math.pow(6, 2))` -> Will return `36`
+- `Execute("sampleJobId123", fs.ReadFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
 
 # License
 Copyright (c) Kiseki 2023. All rights reserved.
