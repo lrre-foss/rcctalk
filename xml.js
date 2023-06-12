@@ -1,13 +1,12 @@
 import { XMLParser } from "fast-xml-parser"
-import xmlFormat from "xml-formatter"
 
 const template = 
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-    "<SOAP-ENV:envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
+    "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>" +
+    "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
     "<SOAP-ENV:Body>" +
     "{{body}}" +
     "</SOAP-ENV:Body>" +
-    "</SOAP-ENV:envelope>"
+    "</SOAP-ENV:Envelope>"
 
 const parser = new XMLParser()
 
@@ -95,10 +94,7 @@ function generateEnvelope(operations) {
         xml += generateOperationXml(operations[i])
     }
 
-    // We prettify for two reasons:
-    // 1. so that we don't seem that different from an actual SOAP envelope
-    // 2. to make it easier to debug
-    return xmlFormat(template.replace("{{body}}", xml))
+    return template.replace("{{body}}", xml)
 }
 
 function getJsValueFromLuaXml(xml) {
@@ -158,12 +154,12 @@ function parseEnvelope(envelope) {
         let result = parser.parse(envelope)
         body = result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]
     } catch (e) {
-        response.error = `Corrupted SOAP envelope (${e})`
+        response.error = `Corrupted SOAP response - ${e}`
         return response
     }
 
     if (body.hasOwnProperty("SOAP-ENV:Fault")) {
-        response.error = body["SOAP-ENV:Fault"]["faultstring"]
+        response.error = `RCCService error - ${body["SOAP-ENV:Fault"]["faultstring"]}`
         return response
     }
 
