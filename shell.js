@@ -56,6 +56,7 @@ const commands = {
         handler: () => {
             if (!soap.isConnected()) {
                 console.log(c.r("You must first be connected to a RCCService instance in order to disconnect!"))
+                return
             }
 
             console.log(`Disconnected from ${c.y(soap.getFormattedIP())}`) // we didn't actually disconnect (yet) but they don't need to know that
@@ -639,7 +640,7 @@ const operations = {
                 }
             }])
             let elapsed = Date.now() - start
-            
+
             let error = soap.fault()
             if (!error) {
                 spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
