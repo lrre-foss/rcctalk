@@ -1,25 +1,13 @@
 import fs from "node:fs"
 import readline from "node:readline"
 
-import chalk from "chalk"
 import colorize from "json-colorizer"
 import ora from "ora"
 import { v4 as uuid } from "uuid"
 
+import c from "./chalk.js"
 import app from "./app.js"
 import soap from "./soap.js"
-
-// Quickly access chalk functions @_@
-const c = {
-    r: chalk.redBright,
-    g: chalk.greenBright,
-    y: chalk.yellowBright,
-    m: chalk.magentaBright,
-    c: chalk.cyanBright,
-    w: chalk.whiteBright,
-    b: chalk.blueBright,
-    gr: chalk.grey
-}
 
 const logo = "              _        _ _    " +
       "\n" + "             | |      | | |   " +
@@ -39,30 +27,22 @@ const commands = {
             ip = soap.sanitize(ip)
 
             if (ip === null) {
-                console.log(c.r("Invalid IP address!"))
+                console.log(`${c.r("Invalid IP address!")} Please pass a valid IPv4 address (e.g. "127.0.0.1") to connect to a RCCService instance at 127.0.0.1 with port 64989, or manually set the SOAP port with a colon (e.g. "127.0.0.1:12345").`)
                 return
             }
             
-            let spinner = ora({
-                text: `Connecting to ${c.y(ip)}`,
-                spinner: "simpleDotsScrolling"
-            })
-
+            let spinner = ora(`Connecting to ${c.y(ip.address)}`)
             spinner.start()
 
             let start = Date.now()
-            await soap.connect(ip)
+            await soap.connect(ip.address, ip.port)
             let elapsed = Date.now() - start
             
-            spinner.suffixText = soap.fault(false) ? `${c.r("Error!")}` : `Connected! (took ${c.g(elapsed + "ms")})`
-            spinner.stop()
-            soap.error()
-
-            if (!soap.fault()) {
-                spinner.suffixText = `Connected! (took ${c.g(elapsed + "ms")})`
+            if (soap.fault(false)) {
+                spinner.fail(soap.fault(false))
+            } else {
+                spinner.succeed(`Connected to ${c.y(ip.address)}! (took ${elapsed + "ms"})`)
             }
-
-            io.setPrompt(c.y(soap.getIP()))
         }
     },
     "disconnect": {
@@ -136,7 +116,7 @@ const commands = {
                 if (!operation.hasOwnProperty("parameters")) {
                     console.log(")")
                 } else {
-                    let i = 0
+                    let x = 0
                     for (let name in operation.parameters) {
                         let parameter = operation.parameters[name]
 
@@ -158,13 +138,13 @@ const commands = {
                             }
                         }
 
-                        if (i == Object.keys(operation.parameters).length - 1) {
+                        if (x == Object.keys(operation.parameters).length - 1) {
                             console.log(")")
                         } else {
                             process.stdout.write(", ")
                         }
 
-                        i++
+                        x++
                     }
                 }
             }
@@ -543,7 +523,7 @@ function startup() {
 
     console.log(`Version ${app.version}`)
     console.log(`${c.b(app.url)}\n`)
-    
+
     console.log(`Type ${c.y("help")} to get started`)
 }
 
@@ -557,12 +537,18 @@ async function open(options) {
     feed()
 }
 
-function feed() {
-    io.question("> ", async (input) => {
+async function feed() {
+    io.question(`${soap.getIP() == null ? "" : c.y(soap.getIP())}> `, async (input) => {
         if (input == "help") {
             commands.help.handler()
         } else if (input == "exit") {
             commands.exit.handler()
+        } else if (input == "disconnect") {
+            commands.disconnect.handler()
+        } else if (input.includes("connect")) {
+            await commands.connect.handler(input.split(" ")[1])
+        } else if (input.includes("ping")) {
+            await commands.ping.handler()
         }
 
         feed()

@@ -47,20 +47,15 @@ function getIP() {
 }
 
 function fault(displayError = true) {
-    let result = errorMessage != null
+    // This function sucks
+    let result = errorMessage
 
-    if (displayError) {
-        error()
+    if (displayError && errorMessage != null) {
+        console.log(errorMessage)
     }
 
-    return result
-}
-
-function error() {
-    console.log(errorMessage)
     errorMessage = null
-
-    return errorMessage
+    return result
 }
 
 async function connect(_ip, _port) {
@@ -127,4 +122,4 @@ async function send(data) {
     return response
 }
 
-export default { sanitize, getIP, fault, error, connect, disconnect, send }
+export default { sanitize, getIP, fault, connect, disconnect, send }
