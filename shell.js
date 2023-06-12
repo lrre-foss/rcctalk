@@ -35,9 +35,9 @@ const commands = {
         handler: async (ip) => {
             connection.disconnect()
 
-            let ip = soap.sanitize(ip)
+            ip = soap.sanitize(ip)
 
-            if (!soap.sanitize(ip)) {
+            if (ip === null) {
                 console.log(c.r("Invalid IP address!"))
                 return
             }
