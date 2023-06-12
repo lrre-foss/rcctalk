@@ -42,8 +42,16 @@ function sanitize(ip) {
     }
 }
 
-function getIP() {
-    return ip
+function isConnected() {
+    return ip !== null && port !== null
+}
+
+function formatIP(ip, port) {
+    return `${ip}${port == 64989 ? "" : ":" + port}`
+}
+
+function getFormattedIP() {
+    return formatIP(ip, port)
 }
 
 function fault(displayError = true) {
@@ -122,4 +130,13 @@ async function send(data) {
     return response
 }
 
-export default { sanitize, getIP, fault, connect, disconnect, send }
+export default {
+    sanitize,
+    isConnected,
+    formatIP,
+    getFormattedIP,
+    fault,
+    connect,
+    disconnect,
+    send
+}

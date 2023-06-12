@@ -22,14 +22,19 @@ const commands = {
         description: "connect to a RCCService instance at the specified IP address (default port: 64989)",
         parameters: ["ip"],
         handler: async (ip) => {
-            soap.disconnect()
-
             ip = soap.sanitize(ip)
 
             if (ip === null) {
                 console.log(`${c.r("Invalid IP address!")} Please pass a valid IPv4 address (e.g. "127.0.0.1") to connect to a RCCService instance at 127.0.0.1 with port 64989, or manually set the SOAP port with a colon (e.g. "127.0.0.1:12345").`)
                 return
             }
+
+            if (soap.isConnected() && soap.getFormattedIP() == soap.formatIP(ip.address, ip.port)) {
+                console.log(`${c.r("You are already connected to this RCCService instance!")}`)
+                return
+            }
+
+            soap.disconnect()
             
             let spinner = ora(`Connecting to ${c.y(ip.address)}`)
             spinner.start()
@@ -41,7 +46,7 @@ const commands = {
             if (soap.fault(false)) {
                 spinner.fail(soap.fault(false))
             } else {
-                spinner.succeed(`Connected to ${c.y(ip.address)}! (took ${elapsed + "ms"})`)
+                spinner.succeed(`Connected to ${c.y(soap.getFormattedIP())}! (took ${elapsed + "ms"})`)
             }
         }
     },
@@ -55,6 +60,11 @@ const commands = {
     "version": {
         description: "prints the version number of the connected RCCService instance",
         handler: async () => {
+            if (!soap.connected()) {
+                console.log(`${c.r("You are not connected to a RCCService instance!")}`)
+                return
+            }
+
             let response = await soap.send([{
                 "GetVersion": {}
             }])
@@ -67,6 +77,11 @@ const commands = {
     "ping": {
         description: "pings the connected RCCService instance",
         handler: async () => {
+            if (!soap.connected()) {
+                console.log(`${c.r("You are not connected to a RCCService instance!")}`)
+                return
+            }
+            
             let start = Date.now()
             let response = await soap.send([{
                 "HelloWorld": {}
@@ -538,7 +553,7 @@ async function open(options) {
 }
 
 async function feed() {
-    io.question(`${soap.getIP() == null ? "" : c.y(soap.getIP())}> `, async (input) => {
+    io.question(`${soap.connected() ? "" : c.y(soap.getFormattedIP())}> `, async (input) => {
         if (input == "help") {
             commands.help.handler()
         } else if (input == "exit") {
