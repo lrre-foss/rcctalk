@@ -1,3 +1,4 @@
+import xmlFormat from "xml-formatter"
 import { XMLParser, XMLValidator } from "fast-xml-parser"
 
 const template = 
@@ -92,7 +93,10 @@ function generateEnvelope(operations) {
         xml += generateOperationXml(operations[i])
     }
 
-    return template.replace("{{body}}", xml)
+    // We prettify for two reasons:
+    // 1. so that we don't seem that different from an actual SOAP envelope
+    // 2. to make it easier to debug
+    return xmlFormat(template.replace("{{body}}", xml))
 }
 
 export default { generateEnvelope }
