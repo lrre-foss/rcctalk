@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser"
 import xmlFormat from "xml-formatter"
-
+import colorize from "json-colorizer"
 const template = 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
     "<SOAP-ENV:envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
@@ -103,6 +103,8 @@ function generateEnvelope(operations) {
 
 function getJsValueFromLuaXml(xml) {
     switch (xml["ns1:type"]) {
+        case "LUA_TTABLE":
+            return parseLuaValueXml(Object.values(xml["ns1:table"]))
         case "LUA_TBOOLEAN":
             return xml["ns1:value"] == "true"
         case "LUA_TNUMBER":
@@ -117,21 +119,27 @@ function getJsValueFromLuaXml(xml) {
 }
 
 function parseLuaValueXml(value) {
-    let parsed = []
+    let parsed
 
-    for (let element of value) {
-        if (element.hasOwnProperty("ns1:value")) {
-            parsed.push(getJsValueFromLuaXml(element))
-        } else {
-            let values = Object.values(element["ns1:table"])
-            let table = []
+    if (!Array.isArray(value)) {
+        parsed = getJsValueFromLuaXml(value)
+    } else {
+        parsed = []
 
-            for (let value of values) {
-                table.push(parseLuaValueXml(value))
+        for (let element of value) {
+            if (element.hasOwnProperty("ns1:value")) {
+                parsed.push(getJsValueFromLuaXml(element))
+            } else {
+                let table = Object.values(element["ns1:table"])[0]
+                let reconstructed = []
+    
+                for (let nested of table) {
+                    reconstructed.push(parseLuaValueXml(nested))
+                }
+    
+                parsed.push(reconstructed)
             }
-
-            parsed.push(table)
-        }
+        }   
     }
 
     return parsed
@@ -192,7 +200,7 @@ function parseEnvelope(envelope) {
 
     response.success = true
     response.data = body
-    
+
     return response
 }
 
