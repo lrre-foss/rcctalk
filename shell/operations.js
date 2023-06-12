@@ -1,5 +1,4 @@
-import net from "./net.js"
-
+import net from "../net.js"
 import util from "../util.js"
 
 export default {

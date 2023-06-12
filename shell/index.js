@@ -54,6 +54,24 @@ async function open(options) {
 
 async function feed() {
     io.question(`${net.isConnected() ? util.yellow(net.getFormattedHostname()) : ""}> `, async (input) => {
+        if (input == "help") {
+            commands.help.handler()
+        } else if (input == "exit") {
+            commands.exit.handler()
+        } else if (input == "disconnect") {
+            commands.disconnect.handler()
+        } else if (input == "version") {
+            await commands.version.handler()
+        } else if (input == "operations") {
+            commands.operations.handler()
+        } else if (input == "commands") {
+            commands.commands.handler()
+        } else if (input.includes("connect")) {
+            await commands.connect.handler(input.split(" ")[1])
+        } else if (input == "ping") {
+            await commands.ping.handler()
+        }
+        
         feed()
     })
 }

@@ -1,4 +1,4 @@
-import shell from "./shell"
+import shell from "./shell/index.js"
 
 const version = "1.0.0"
 const url = "https://github.com/kiseki-lol/rcctalk"

@@ -32,13 +32,13 @@ function colorizeOperation(name, data) {
 
     // Operation type
     if (typeof data.returns !== "object") {
-        colorized += `${blue(operation.returns)}`
+        colorized += `${blue(data.returns)}`
     } else {
-        let type = operation.returns.type
+        let type = data.returns.type
         colorized += type.includes("[]") ? `${green(type.replace("[]", "")) + white("[]")}` : `${green(type)}`
 
-        if (operation.returns.hasOwnProperty("required")) {
-            colorized += `${magenta(operation.returns.required ? "" : "?")}`
+        if (data.returns.hasOwnProperty("required")) {
+            colorized += `${magenta(data.returns.required ? "" : "?")}`
         }
     }
 
@@ -49,7 +49,7 @@ function colorizeOperation(name, data) {
     // Operation parameters
     colorized += "("
 
-    if (!operation.hasOwnProperty("parameters")) {
+    if (!data.hasOwnProperty("parameters")) {
         colorized += ")"
         return colorized
     }
@@ -70,7 +70,7 @@ function colorizeOperation(name, data) {
             }
         }
 
-        if (index == Object.keys(operation.parameters).length - 1) {
+        if (index == Object.keys(data.parameters).length - 1) {
             colorized += ")"
         } else {
             colorized += ", "

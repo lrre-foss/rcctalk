@@ -60,8 +60,8 @@ function isConnected() {
 
 // This function sucks (and is a bit of a hack)
 function fault() {
-    let result = errorMessage
-    errorMessage = null
+    let result = error
+    error = null
     return result
 }
 
@@ -110,7 +110,7 @@ async function send(data) {
             }
         })
     } catch (e) {
-        errorMessage = `${util.red("Failed to send data to RCCService instance")}: ${e}`
+        error = `${util.red("Failed to send data to RCCService instance")}: ${e}`
         response = null
     }
 
