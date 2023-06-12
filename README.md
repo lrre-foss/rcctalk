@@ -5,7 +5,7 @@ Powerful command line utility to communicate with RCCService instances
 ![](https://github.com/kiseki-lol/rcctalk/raw/trunk/screenshot.png)
 
 # Usage
-rcctalk is a console application that can be installed by cloning the repository and then running the command `npm i -g`. You can then easily open the rcctalk shell from the command line by just typing `rcctalk`. For further instructions, please run `rcctalk --help` or type `help` into the shell.
+rcctalk is a console application that can be installed by cloning the repository and then running the command `npm i -g` to install it system-wide. You can then easily open the rcctalk shell from the command line by entering `rcctalk`. For further instructions, please run `rcctalk --help` or type `help` into the shell.
 
 ## Example operations
 - `OpenJob("sampleJobId123", "return 'Hello world!'")` -> Opens a job and returns `Hello world!`
