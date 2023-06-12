@@ -127,7 +127,7 @@ function parseLuaValueXml(value) {
             let table = []
 
             for (let value of values) {
-                table.push(getJsValueFromLuaXml(value))
+                table.push(parseLuaValueXml(value))
             }
 
             parsed.push(table)
@@ -162,7 +162,7 @@ function parseEnvelope(envelope) {
     body = Object.values(body)[0]
 
     let type = Object.keys(body)[0].split(":")[1].replace("Result", "")
-    
+
     if (type == "OpenJob" || type == "Execute" || type == "BatchJob" || type == "Diag") {
         // This is a LuaValue[]
         body = parseLuaValueXml(Object.values(body)[0])
