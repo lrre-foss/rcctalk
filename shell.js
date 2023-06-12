@@ -39,7 +39,7 @@ const commands = {
         handler: connection.disconnect
     },
     "version": {
-        description: "output the version number of the connected RCCService instance",
+        description: "prints the version number of the connected RCCService instance",
         handler: async () => {
             let result = await connection.send([{
                 "GetVersion": {}
@@ -147,7 +147,7 @@ const commands = {
                 // Parameters
                 if (command.hasOwnProperty("parameters")) {
                     for (let parameter of command.parameters) {
-                        process.stdout.write(` ${c.m(`<${parameter}>`)}`)
+                        process.stdout.write(` ${c.c(`<${parameter}>`)}`)
                     }
                 }
 
