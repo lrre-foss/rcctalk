@@ -25,6 +25,33 @@ export default {
             }
         }
     },
+    "Diag": {
+        returns: {
+            userdata: true,
+            type: "LuaValue[]",
+            required: false
+        },
+        parameters: {
+            "type": {
+                type: "int",
+                required: true
+            },
+            "jobID": {
+                type: "string",
+                required: false
+            }
+        },
+        handler: async (type, jobID) => {
+            return {
+                data: await net.send([{
+                    "Diag": {
+                        "type": type,
+                        "jobID": jobID
+                    }
+                }])
+            }
+        }
+    },
     "OpenJob": {
         returns: {
             userdata: true,
@@ -78,77 +105,6 @@ export default {
                         }
                     }
                 }])
-            }
-        }
-    },
-    "RenewLease": {
-        returns: "double",
-        parameters: {
-            "jobID": {
-                type: "string",
-                required: true
-            },
-            "expirationInSeconds": {
-                type: "double",
-                required: true
-            }
-        },
-        handler: async (jobID, expirationInSeconds) => {
-            return await net.send([{
-                "RenewLease": {
-                    "jobID": jobID,
-                    "expirationInSeconds": expirationInSeconds
-                }
-            }])
-        }
-    },
-    "Execute": {
-        returns: {
-            userdata: true,
-            type: "LuaValue[]",
-        },
-        parameters: {
-            "jobID": {
-                type: "string",
-                required: true
-            },
-            "script": {
-                type: "string",
-                required: true
-            },
-            "arguments": {
-                type: "array",
-                required: false,
-                default: []
-            }
-        },
-        handler: async (jobID, script, data) => {
-            return {
-                data: await net.send([{
-                    "Execute": {
-                        "jobID": jobID,
-                        "script": {
-                            "name": uuid(),
-                            "script": script,
-                            "arguments": data
-                        }
-                    }
-                }])
-            }
-        }
-    },
-    "CloseJob": {
-        returns: "void",
-        parameters: {
-            "jobID": {
-                type: "string",
-                required: true
-            },
-        },
-        handler: async (jobID) => {
-            return {
-                message: `Succesfully closed job with ID "${jobID}"! (took ${util.green("%sms")})`,
-                data: await net.send([{ "CloseJob": { "jobID": jobID } }])
             }
         }
     },
@@ -208,6 +164,62 @@ export default {
             }
         }
     },
+    "Execute": {
+        returns: {
+            userdata: true,
+            type: "LuaValue[]",
+        },
+        parameters: {
+            "jobID": {
+                type: "string",
+                required: true
+            },
+            "script": {
+                type: "string",
+                required: true
+            },
+            "arguments": {
+                type: "array",
+                required: false,
+                default: []
+            }
+        },
+        handler: async (jobID, script, data) => {
+            return {
+                data: await net.send([{
+                    "Execute": {
+                        "jobID": jobID,
+                        "script": {
+                            "name": uuid(),
+                            "script": script,
+                            "arguments": data
+                        }
+                    }
+                }])
+            }
+        }
+    },
+    "RenewLease": {
+        returns: "double",
+        parameters: {
+            "jobID": {
+                type: "string",
+                required: true
+            },
+            "expirationInSeconds": {
+                type: "double",
+                required: true
+            }
+        },
+        handler: async (jobID, expirationInSeconds) => {
+            return await net.send([{
+                "RenewLease": {
+                    "jobID": jobID,
+                    "expirationInSeconds": expirationInSeconds
+                }
+            }])
+        }
+    },
     "GetExpiration": {
         returns: "double",
         parameters: {
@@ -234,6 +246,21 @@ export default {
             }
         }
     },
+    "CloseJob": {
+        returns: "void",
+        parameters: {
+            "jobID": {
+                type: "string",
+                required: true
+            },
+        },
+        handler: async (jobID) => {
+            return {
+                message: `Succesfully closed job with ID "${jobID}"! (took ${util.green("%sms")})`,
+                data: await net.send([{ "CloseJob": { "jobID": jobID } }])
+            }
+        }
+    },
     "CloseAllJobs": {
         returns: "int",
         handler: async () => {
@@ -249,33 +276,6 @@ export default {
             return {
                 message: `Succesfully closed ${util.yellow("%d")} expired jobs! (took ${util.green("%sms")})`,
                 data: await net.send([{ "CloseExpiredJobs": null }])
-            }
-        }
-    },
-    "Diag": {
-        returns: {
-            userdata: true,
-            type: "LuaValue[]",
-            required: false
-        },
-        parameters: {
-            "type": {
-                type: "int",
-                required: true
-            },
-            "jobID": {
-                type: "string",
-                required: false
-            }
-        },
-        handler: async (type, jobID) => {
-            return {
-                data: await net.send([{
-                    "Diag": {
-                        "type": type,
-                        "jobID": jobID
-                    }
-                }])
             }
         }
     }
