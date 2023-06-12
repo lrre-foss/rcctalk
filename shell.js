@@ -105,10 +105,17 @@ const commands = {
                         let parameter = operation.parameters[name]
 
                         // Parameter type & name
-                        if (parameter.required) {
-                            process.stdout.write(`${c.r(parameter.type)} ${c.w(name)}`)
+                        if (parameter.type.includes("|")) {
+                            let types = parameter.type.split("|")
+                            process.stdout.write(`${c.r(types[0])}${c.gr("|")}${c.r(types[1])}`)
                         } else {
-                            process.stdout.write(`${c.r(parameter.type)}${c.m("?")} ${c.w(name)}`)
+                            process.stdout.write(`${c.r(parameter.type)}`)
+                        }
+
+                        if (parameter.required) {
+                            process.stdout.write(` ${c.w(name)}`)
+                        } else {
+                            process.stdout.write(`${c.m("?")} ${c.w(name)}`)
 
                             if (parameter.hasOwnProperty("default")) {
                                 process.stdout.write(` = ${typeof parameter.default === "object" ? c.w("[]") : c.c(parameter.default)}`)
@@ -196,7 +203,7 @@ const operations = {
                 default: 1
             },
             "script": {
-                type: "string",
+                type: "string|filepath",
                 required: true
             },
             "arguments": {
@@ -230,7 +237,7 @@ const operations = {
                 required: true
             },
             "script": {
-                type: "string",
+                type: "string|filepath",
                 required: true
             },
             "arguments": {
@@ -275,7 +282,7 @@ const operations = {
                 default: 1
             },
             "script": {
-                type: "string",
+                type: "string|filepath",
                 required: true
             },
             "arguments": {
