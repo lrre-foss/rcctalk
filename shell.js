@@ -196,6 +196,7 @@ const commands = {
     "exit": {
         description: "closes rcctalk",
         handler: () => {
+            console.log("Farewell!")
             process.exit(0)
         }
     }
@@ -540,7 +541,9 @@ function startup() {
         console.log(c.r(line.slice(0, colorIndex)) + c.w(line.slice(colorIndex)))
     }
 
-    console.log(`version ${app.version}\n`)
+    console.log(`Version ${app.version}`)
+    console.log(`${c.b(app.url)}\n`)
+    
     console.log(`Type ${c.y("help")} to get started`)
 }
 

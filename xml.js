@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser"
 import xmlFormat from "xml-formatter"
-import colorize from "json-colorizer"
+
 const template = 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
     "<SOAP-ENV:envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
