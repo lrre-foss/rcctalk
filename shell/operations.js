@@ -113,7 +113,7 @@ export default {
                 required: true
             },
             "script": {
-                type: "string|filepath",
+                type: "string",
                 required: true
             },
             "arguments": {

@@ -12,6 +12,23 @@ var hostname = {
     port: null
 }
 
+// https://dmitripavlutin.com/timeout-fetch-request/
+async function fetchWithTimeout(resource, options = {}) {
+    let { timeout = 8000 } = options
+
+    let controller = new AbortController()
+    let id = setTimeout(() => controller.abort(), timeout)
+  
+    let response = await fetch(resource, {
+        ...options,
+        signal: controller.signal  
+    })
+
+    clearTimeout(id)
+
+    return response
+}
+
 function sanitizeHostname(hostname) {
     if (!hostname.length) {
         return null
@@ -69,13 +86,16 @@ function fault() {
 async function connect(ip, port) {
     // We do this instead of send() to get a more verbose output upon failure
     try {
-        let response = await fetch(`http://${ip}:${port}/`, {
+        let response = await fetchWithTimeout(`http://${ip}:${port}/`, {
             method: "POST",
             body: xml.generateEnvelope([{ "HelloWorld": null }]),
+            timeout: 60000,
             headers: {
                 "Content-Type": "application/xml"
             }
         })
+
+        clearTimeout(timeout)
 
         let text = await response.text()
         let parsed = xml.parseEnvelope(text)
@@ -102,9 +122,10 @@ async function send(data) {
     let response = null
 
     try {
-        response = await fetch(`http://${hostname.ip}:${hostname.port}/`, {
+        response = await fetchWithTimeout(`http://${hostname.ip}:${hostname.port}/`, {
             method: "POST",
             body: envelope,
+            timeout: 60000,
             headers: {
                 "Content-Type": "application/xml"
             }

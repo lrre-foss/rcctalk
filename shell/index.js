@@ -10,8 +10,7 @@ import app from "../app.js"
 import net from "../net.js"
 import util from "../util.js"
 
-// These modules are never used within this file, but we import them anyways so that users may easily access them
-// from the shell.
+// These modules are never used within this file, but we import them anyways so that users may easily access them from the shell.
 import fs from "node:fs"
 import path from "node:path"
 import fetch from "node-fetch"
