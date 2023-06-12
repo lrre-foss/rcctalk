@@ -1,8 +1,8 @@
 import { XMLParser } from "fast-xml-parser"
 
 const template = 
-    "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>" +
-    "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
+    "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+    "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
     "<SOAP-ENV:Body>" +
     "{{body}}" +
     "</SOAP-ENV:Body>" +
@@ -11,49 +11,53 @@ const template =
 const parser = new XMLParser()
 
 function getLuaType(value) {
-    let type = "LUA_T"
-
     switch (typeof value) {
         case "undefined":
         case "object": 
-            type += "NIL"
-            break
+            /*
+             * This function is called under the presumption that checks for arrays and objects have already been made
+             * (and thus appropriately sent back to generateLuaValueXml). However, since JavaScript considers null and
+             * undefined to be objects, and knowing that the value is not going to be an object, we can safely return
+             * LUA_TNIL.
+             */
+
+            return "LUA_TNIL" 
         case "boolean":
-            type += "BOOLEAN"
-            break
+            return "LUA_TBOOLEAN"
         case "number":
         case "bigint":
-            type += "NUMBER"
-            break
+            return "LUA_TNUMBER"
         case "string":
         case "symbol":
-            type += "STRING"
-            break
+            return "LUA_TSTRING"
         default:
-            type += "NIL"
-            break
+            return "LUA_TNIL"
     }
-
-    return type
 }
 
 function generateLuaValueXml(value) {
     let xml = ""
+    
     xml += "<ns1:LuaValue>"
 
     if (typeof value === "object" && value !== null) {
         xml += `<ns1:type>LUA_TTABLE</ns1:type>`
         xml += "<ns1:table>"
+
         for (let key in value) {
             xml += generateLuaValueXml(key)
         }
+
         xml += "</ns1:table>"
     } else {
-        xml += `<ns1:type>${getLuaType(value)}</ns1:type>`
-        xml += `<ns1:value>${getLuaType(value) == "LUA_TNIL" ? "" : value}</ns1:value>`
+        let type = getLuaType(value)
+
+        xml += `<ns1:type>${type}</ns1:type>`
+        xml += type != "LUA_TNIL" ? `<ns1:value>${value}</ns1:value>` : ""
     }
 
     xml += "</ns1:LuaValue>"
+
     return xml
 }
 
@@ -167,8 +171,8 @@ function parseEnvelope(envelope) {
 
     let type = Object.keys(body)[0].split(":")[1].replace("Result", "")
 
+    // TODO: Perhaps don't hardcode this? We can probably check if the type is a LuaValue[] in a better way.
     if (type == "OpenJob" || type == "Execute" || type == "BatchJob" || type == "Diag") {
-        // This is a LuaValue[]
         body = parseLuaValueXml(Object.values(body)[0])
     } else {
         if (Object.values(body).length == 1) {
