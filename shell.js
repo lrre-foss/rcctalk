@@ -33,7 +33,7 @@ const commands = {
         description: "connect to a RCCService instance",
         parameters: ["ip"],
         handler: async (ip) => {
-            connection.disconnect()
+            soap.disconnect()
 
             ip = soap.sanitize(ip)
 
@@ -50,35 +50,35 @@ const commands = {
             spinner.start()
 
             let start = Date.now()
-            await connection.connect(ip)
+            await soap.connect(ip)
             let elapsed = Date.now() - start
             
-            spinner.suffixText = connection.fault(false) ? `${c.r("Error!")}` : `Connected! (took ${c.g(elapsed + "ms")})`
+            spinner.suffixText = soap.fault(false) ? `${c.r("Error!")}` : `Connected! (took ${c.g(elapsed + "ms")})`
             spinner.stop()
-            connection.error()
+            soap.error()
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 spinner.suffixText = `Connected! (took ${c.g(elapsed + "ms")})`
             }
 
-            io.setPrompt(c.y(connection.getIp()))
+            io.setPrompt(c.y(soap.getIp()))
         }
     },
     "disconnect": {
         description: "disconnects from the connected RCCService instance",
         handler: () => {
-            connection.disconnect()
+            soap.disconnect()
             io.setPrompt("")
         }
     },
     "version": {
         description: "prints the version number of the connected RCCService instance",
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "GetVersion": {}
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(`Connected to RCCService version ${response}`)
             }
         }
@@ -87,12 +87,12 @@ const commands = {
         description: "pings the connected RCCService instance",
         handler: async () => {
             let start = Date.now()
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "HelloWorld": {}
             }])
             let elapsed = Date.now() - start
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(`Pong! (RCCService returned "${response}" in ${c.g(`${elapsed}ms`)})`)
             }
         }
@@ -204,11 +204,11 @@ const operations = {
     "HelloWorld": {
         returns: "string",
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "HelloWorld": {}
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(response)
             }
         }
@@ -216,11 +216,11 @@ const operations = {
     "GetVersion": {
         returns: "string",
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "GetVersion": {}
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(response)
             }
         }
@@ -231,11 +231,11 @@ const operations = {
             type: "Status",
         },
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "Status": {}
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(colorize(response, { pretty: true }))
             }
         }
@@ -280,7 +280,7 @@ const operations = {
                 script = fs.readFileSync(script, "utf8")
             }
 
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "OpenJob": {
                     "job": {
                         "id": jobID,
@@ -297,7 +297,7 @@ const operations = {
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(colorize(response, { pretty: true }))
             }
         }
@@ -315,14 +315,14 @@ const operations = {
             }
         },
         handler: async (jobID, expirationInSeconds) => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "RenewLease": {
                     "jobID": jobID,
                     "expirationInSeconds": expirationInSeconds
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(response)
             }
         }
@@ -352,7 +352,7 @@ const operations = {
                 script = fs.readFileSync(script, "utf8")
             }
 
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "Execute": {
                     "jobID": jobID,
                     "script": {
@@ -363,7 +363,7 @@ const operations = {
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(colorize(response, { pretty: true }))
             }
         }
@@ -377,13 +377,13 @@ const operations = {
             },
         },
         handler: async (jobID) => {
-            await connection.send([{
+            await soap.send([{
                 "CloseJob": {
                     "jobID": jobID
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(`Successfully closed job with ID "${jobID}"`)
             }
         }
@@ -428,7 +428,7 @@ const operations = {
                 script = fs.readFileSync(script, "utf8")
             }
 
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "OpenJob": {
                     "job": {
                         "id": jobID,
@@ -445,7 +445,7 @@ const operations = {
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(colorize(response, { pretty: true }))
             }
         }
@@ -459,13 +459,13 @@ const operations = {
             },
         },
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "GetExpiration": {
                     "jobID": jobID
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(response)
             }
         }
@@ -476,11 +476,11 @@ const operations = {
             type: "Job[]"
         },
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "GetAllJobs": {}
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(colorize(response, { pretty: true }))
             }
         }
@@ -488,11 +488,11 @@ const operations = {
     "CloseExpiredJobs": {
         returns: "int",
         handler: async () => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "CloseExpiredJobs": {}
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(response)
             }
         }
@@ -513,14 +513,14 @@ const operations = {
             }
         },
         handler: async (type, jobID) => {
-            let response = await connection.send([{
+            let response = await soap.send([{
                 "Diag": {
                     "type": type,
                     "jobID": jobID
                 }
             }])
 
-            if (!connection.fault()) {
+            if (!soap.fault()) {
                 console.log(colorize(response, { pretty: true }))
             }
         }
