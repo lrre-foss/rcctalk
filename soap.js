@@ -54,14 +54,9 @@ function getFormattedIP() {
     return formatIP(ip, port)
 }
 
-function fault(displayError = true) {
+function fault() {
     // This function sucks
     let result = errorMessage
-
-    if (displayError && errorMessage != null) {
-        console.log(errorMessage)
-    }
-
     errorMessage = null
     return result
 }

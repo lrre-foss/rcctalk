@@ -30,21 +30,22 @@ const commands = {
             }
 
             if (soap.isConnected() && soap.getFormattedIP() == soap.formatIP(ip.address, ip.port)) {
-                console.log(`${c.r("You are already connected to this RCCService instance!")}`)
+                console.log(c.r("You are already connected to this RCCService instance!"))
                 return
             }
 
             soap.disconnect()
             
-            let spinner = ora(`Connecting to ${c.y(ip.address)}`)
+            let spinner = ora(`Connecting to ${c.y(ip.address)}...`)
             spinner.start()
 
             let start = Date.now()
             await soap.connect(ip.address, ip.port)
             let elapsed = Date.now() - start
-            
-            if (soap.fault(false)) {
-                spinner.fail(soap.fault(false))
+
+            let error = soap.fault()
+            if (error) {
+                spinner.fail(error)
             } else {
                 spinner.succeed(`Connected to ${c.y(soap.getFormattedIP())}! (took ${elapsed + "ms"})`)
             }
@@ -53,24 +54,34 @@ const commands = {
     "disconnect": {
         description: "disconnects from the connected RCCService instance",
         handler: () => {
+            if (!soap.isConnected()) {
+                console.log(c.r("You must first be connected to a RCCService instance in order to disconnect!"))
+            }
+
+            console.log(`Disconnected from ${c.y(soap.getFormattedIP())}`) // we didn't actually disconnect (yet) but they don't need to know that
             soap.disconnect()
-            io.setPrompt("")
         }
     },
     "version": {
         description: "prints the version number of the connected RCCService instance",
         handler: async () => {
             if (!soap.isConnected()) {
-                console.log(`${c.r("You are not connected to a RCCService instance!")}`)
+                console.log(c.r("You are not connected to a RCCService instance!"))
                 return
             }
+
+            let spinner = ora(`Sending...`)
+            spinner.start()
 
             let response = await soap.send([{
                 "GetVersion": {}
             }])
 
-            if (!soap.fault()) {
-                console.log(`Connected to RCCService version ${response}`)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`Connected to RCCService version ${c.y(response)}!`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -78,9 +89,12 @@ const commands = {
         description: "pings the connected RCCService instance",
         handler: async () => {
             if (!soap.isConnected()) {
-                console.log(`${c.r("You are not connected to a RCCService instance!")}`)
+                console.log(c.r("You are not connected to a RCCService instance!"))
                 return
             }
+
+            let spinner = ora(`Sending...`)
+            spinner.start()
 
             let start = Date.now()
             let response = await soap.send([{
@@ -88,8 +102,11 @@ const commands = {
             }])
             let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
-                console.log(`Pong! (RCCService returned "${response}" in ${c.g(`${elapsed}ms`)})`)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`Pong! (RCCService returned "${response}" in ${c.g(`${elapsed}ms`)})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -201,24 +218,40 @@ const operations = {
     "HelloWorld": {
         returns: "string",
         handler: async () => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "HelloWorld": {}
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
-                console.log(response)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned "${response}"! (took ${c.g(elapsed + "ms")})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
     "GetVersion": {
         returns: "string",
         handler: async () => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "GetVersion": {}
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
-                console.log(response)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned "${response}"! (took ${c.g(elapsed + "ms")})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -228,12 +261,21 @@ const operations = {
             type: "Status",
         },
         handler: async () => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "Status": {}
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
                 console.log(colorize(response, { pretty: true }))
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -273,6 +315,11 @@ const operations = {
             }
         },
         handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
+
             if (fs.existsSync(script)) {
                 script = fs.readFileSync(script, "utf8")
             }
@@ -294,8 +341,14 @@ const operations = {
                 }
             }])
 
-            if (!soap.fault()) {
+            let elapsed = Date.now() - start
+
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
                 console.log(colorize(response, { pretty: true }))
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -312,15 +365,23 @@ const operations = {
             }
         },
         handler: async (jobID, expirationInSeconds) => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "RenewLease": {
                     "jobID": jobID,
                     "expirationInSeconds": expirationInSeconds
                 }
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
-                console.log(response)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned "${response}"! (took ${c.g(elapsed + "ms")})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -345,7 +406,12 @@ const operations = {
             }
         },
         handler: async (jobID, script, data) => {
-            if (script == basename(script) && fs.existsSync(script)) {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
+
+            if (fs.existsSync(script)) {
                 script = fs.readFileSync(script, "utf8")
             }
 
@@ -360,8 +426,14 @@ const operations = {
                 }
             }])
 
-            if (!soap.fault()) {
+            let elapsed = Date.now() - start
+
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
                 console.log(colorize(response, { pretty: true }))
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -374,14 +446,24 @@ const operations = {
             },
         },
         handler: async (jobID) => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
+
             await soap.send([{
                 "CloseJob": {
                     "jobID": jobID
                 }
             }])
 
-            if (!soap.fault()) {
-                console.log(`Successfully closed job with ID "${jobID}"`)
+            let elapsed = Date.now() - start
+
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`Successfully closed job with ID "${jobID}"! (took ${c.g(elapsed + "ms")})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -421,12 +503,17 @@ const operations = {
             }
         },
         handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
-            if (script == basename(script) && fs.existsSync(script)) {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
+
+            if (fs.existsSync(script)) {
                 script = fs.readFileSync(script, "utf8")
             }
 
             let response = await soap.send([{
-                "OpenJob": {
+                "BatchJob": {
                     "job": {
                         "id": jobID,
                         "expirationInSeconds": expirationInSeconds,
@@ -442,8 +529,14 @@ const operations = {
                 }
             }])
 
-            if (!soap.fault()) {
+            let elapsed = Date.now() - start
+
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
                 console.log(colorize(response, { pretty: true }))
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -456,14 +549,22 @@ const operations = {
             },
         },
         handler: async () => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "GetExpiration": {
                     "jobID": jobID
                 }
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
-                console.log(response)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned "${response}"! (took ${c.g(elapsed + "ms")})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -473,24 +574,41 @@ const operations = {
             type: "Job[]"
         },
         handler: async () => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "GetAllJobs": {}
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
                 console.log(colorize(response, { pretty: true }))
+            } else {
+                spinner.fail(error)
             }
         }
     },
     "CloseExpiredJobs": {
         returns: "int",
         handler: async () => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "CloseExpiredJobs": {}
             }])
+            let elapsed = Date.now() - start
 
-            if (!soap.fault()) {
-                console.log(response)
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned "${response}"! (took ${c.g(elapsed + "ms")})`)
+            } else {
+                spinner.fail(error)
             }
         }
     },
@@ -510,15 +628,24 @@ const operations = {
             }
         },
         handler: async (type, jobID) => {
+            let spinner = ora(`Sending...`)
+            spinner.start()
+
+            let start = Date.now()
             let response = await soap.send([{
                 "Diag": {
                     "type": type,
                     "jobID": jobID
                 }
             }])
-
-            if (!soap.fault()) {
+            let elapsed = Date.now() - start
+            
+            let error = soap.fault()
+            if (!error) {
+                spinner.succeed(`RCCService returned the following response in ${c.g(elapsed + "ms")}:`)
                 console.log(colorize(response, { pretty: true }))
+            } else {
+                spinner.fail(error)
             }
         }
     }
@@ -553,16 +680,22 @@ async function open(options) {
 }
 
 async function feed() {
-    io.question(`${soap.isConnected() ? "" : c.y(soap.getFormattedIP())}> `, async (input) => {
+    io.question(`${soap.isConnected() ? c.y(soap.getFormattedIP()) : ""}> `, async (input) => {
         if (input == "help") {
             commands.help.handler()
         } else if (input == "exit") {
             commands.exit.handler()
         } else if (input == "disconnect") {
             commands.disconnect.handler()
+        } else if (input == "version") {
+            commands.version.handler()
+        } else if (input == "operations") {
+            commands.operations.handler()
+        } else if (input == "commands") {
+            commands.commands.handler()
         } else if (input.includes("connect")) {
             await commands.connect.handler(input.split(" ")[1])
-        } else if (input.includes("ping")) {
+        } else if (input == "ping") {
             await commands.ping.handler()
         }
 
