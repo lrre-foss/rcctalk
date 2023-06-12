@@ -1,10 +1,12 @@
 import fs from "node:fs"
 import readline from "node:readline"
+
 import chalk from "chalk"
 import colorize from "json-colorizer"
+import ora from "ora"
 
 import app from "./app.js"
-import connection from "./connection.js"
+import soap from "./soap.js"
 
 // Quickly access chalk functions @_@
 const c = {
@@ -31,8 +33,34 @@ const commands = {
         description: "connect to a RCCService instance",
         parameters: ["ip"],
         handler: async (ip) => {
+            connection.disconnect()
+
+            let ip = soap.sanitize(ip)
+
+            if (!soap.sanitize(ip)) {
+                console.log(c.r("Invalid IP address!"))
+                return
+            }
+            
+            let spinner = ora({
+                text: `Connecting to ${c.y(ip)}`,
+                spinner: "simpleDotsScrolling"
+            })
+
+            spinner.start()
+
+            let start = Date.now()
             await connection.connect(ip)
-            console.log(`Connected to ${connection.getIp()}`)
+            let elapsed = Date.now() - start
+            
+            spinner.suffixText = connection.fault(false) ? `${c.r("Error!")}` : `Connected! (took ${c.g(elapsed + "ms")})`
+            spinner.stop()
+            connection.error()
+
+            if (!connection.fault()) {
+                spinner.suffixText = `Connected! (took ${c.g(elapsed + "ms")})`
+            }
+
             io.setPrompt(c.y(connection.getIp()))
         }
     },
@@ -58,12 +86,14 @@ const commands = {
     "ping": {
         description: "pings the connected RCCService instance",
         handler: async () => {
+            let start = Date.now()
             let response = await connection.send([{
                 "HelloWorld": {}
             }])
+            let elapsed = Date.now() - start
 
             if (!connection.fault()) {
-                console.log(`Pong! (RCCService returned "${response}" in ${time}ms)`)
+                console.log(`Pong! (RCCService returned "${response}" in ${c.g(`${elapsed}ms`)})`)
             }
         }
     },
@@ -132,6 +162,7 @@ const commands = {
                         } else {
                             process.stdout.write(", ")
                         }
+
                         i++
                     }
                 }
@@ -245,7 +276,7 @@ const operations = {
             }
         },
         handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
-            if (script == basename(script) && fs.existsSync(script)) {
+            if (fs.existsSync(script)) {
                 script = fs.readFileSync(script, "utf8")
             }
 
@@ -526,6 +557,8 @@ function feed() {
     io.question("> ", async (input) => {
         if (input == "help") {
             commands.help.handler()
+        } else if (input == "exit") {
+            commands.exit.handler()
         }
 
         feed()
