@@ -496,7 +496,7 @@ const operations = {
     }
 }
 
-var io = readline.createInterface({
+const io = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     prompt: "> "

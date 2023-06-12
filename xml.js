@@ -1,6 +1,6 @@
 import xmlFormat from "xml-formatter"
-import { XMLParser, XMLValidator } from "fast-xml-parser"
-
+import { XMLParser } from "fast-xml-parser"
+import colorize from "json-colorizer"
 const template = 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
     "<SOAP-ENV:envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
@@ -8,6 +8,8 @@ const template =
     "{{body}}" +
     "</SOAP-ENV:Body>" +
     "</SOAP-ENV:envelope>"
+
+const parser = new XMLParser()
 
 function getLuaType(value) {
     let type = "LUA_T"
@@ -99,4 +101,56 @@ function generateEnvelope(operations) {
     return xmlFormat(template.replace("{{body}}", xml))
 }
 
-export default { generateEnvelope }
+function parseEnvelope(envelope) {
+    let response = {
+        "success": false,
+        "error": null,
+        "data": null
+    }
+
+    let body
+
+    try {
+        let result = parser.parse(envelope)
+        body = result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]
+    } catch (e) {
+        response.error = `Corrupted SOAP envelope (${e})`
+        return response
+    }
+
+    if (body.hasOwnProperty("SOAP-ENV:Fault")) {
+        response.error = body["SOAP-ENV:Fault"]["faultstring"]
+        return response
+    }
+    
+    body = Object.values(body)[0]
+
+    if (Object.values(body).length == 1) {
+        body = Object.values(body)[0]
+    }
+
+    if (typeof body === "object") {
+        let reconstructed = []
+
+        for (let element of body) {
+            let keys = Object.keys(element)
+            let values = Object.values(element)
+            let cleaned = {}
+    
+            for (let key of keys) {
+                cleaned[key.split(":")[1]] = values[keys.indexOf(key)]
+            }
+    
+            reconstructed.push(cleaned)
+        }
+
+        body = reconstructed
+    }
+
+    response.success = true
+    response.data = body
+    
+    return response
+}
+
+export default { generateEnvelope, parseEnvelope }
