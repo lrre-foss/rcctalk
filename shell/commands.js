@@ -9,8 +9,13 @@ const commands = {
     "connect": {
         description: "connect to a RCCService instance at the specified hostname (default port: 64989)",
         parameters: ["ip"],
-        handler: async (hostname) => {
-            hostname = net.sanitizeHostname(hostname)
+        handler: async (parameters) => {
+            if (net.isConnected()) {
+                console.log(`${util.red("Error:")} Please disconnect before connecting to another RCCService instance!`)
+                return
+            }
+
+            let hostname = net.sanitizeHostname(parameters[0])
 
             if (hostname === null) {
                 console.log(`${util.red("Invalid hostname!")} Please pass a valid IPv4 address (e.g. "127.0.0.1") or a hostname to connect to a RCCService instance at 127.0.0.1 with port 64989, or manually set the SOAP port with a colon (e.g. "127.0.0.1:12345").`)
@@ -39,7 +44,7 @@ const commands = {
         description: "disconnects from the connected RCCService instance",
         requiresConnection: true,
         handler: () => {
-            console.log(`Disconnected from ${util.yellow(net.formatHostname())}`)
+            console.log(`Disconnected from ${util.yellow(net.getFormattedHostname())}`)
             net.disconnect()
         }
     },
@@ -53,7 +58,7 @@ const commands = {
             let response = await net.send([{ "GetVersion": null }])
 
             let error = net.fault()
-            error ? spinner.fail(error) : spinner.succeed(`Connected to RCCService version ${util.yellow(response)}!`)
+            error ? spinner.fail(error) : spinner.succeed(`Currently connected to RCCService version ${util.yellow(response)}!`)
         }
     },
     "ping": {

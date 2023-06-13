@@ -14,13 +14,13 @@ function colorizeCommand(name, data) {
     let colorized = ""
 
     // Command name
-    colorized += `${white(name)}`
+    colorized += `${cyan(name)}`
 
     // Parameters
     if (data.hasOwnProperty("parameters")) {
         for (let parameter of data.parameters) {
             colorized += " "
-            colorized += `${cyan(`<${parameter}>`)}`
+            colorized += `${white(`<${parameter}>`)}`
         }
     }
 

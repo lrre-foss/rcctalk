@@ -14,7 +14,7 @@ var hostname = {
 
 // https://dmitripavlutin.com/timeout-fetch-request/
 async function fetchWithTimeout(resource, options = {}) {
-    let { timeout = 8000 } = options
+    let { timeout = 60000 } = options
 
     let controller = new AbortController()
     let id = setTimeout(() => controller.abort(), timeout)
@@ -95,8 +95,6 @@ async function connect(ip, port) {
             }
         })
 
-        clearTimeout(timeout)
-
         let text = await response.text()
         let parsed = xml.parseEnvelope(text)
 
@@ -137,8 +135,9 @@ async function send(data) {
 
     if (response != null) {
         let parsed = xml.parseEnvelope(await response.text())
+
         if (parsed.error) {
-            errorMessage = `${util.red("Error")}: ${parsed.error}`
+            error = `${util.red("Error")}: ${parsed.error}`
             return null
         }
 

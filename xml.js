@@ -181,6 +181,10 @@ function parseEnvelope(envelope) {
     
         if (typeof body === "object") {
             let reconstructed = []
+
+            if (!Array.isArray(body)) {
+                body = [body]
+            }
     
             for (let element of body) {
                 let keys = Object.keys(element)
@@ -188,12 +192,23 @@ function parseEnvelope(envelope) {
                 let cleaned = {}
         
                 for (let key of keys) {
-                    cleaned[key.split(":")[1]] = values[keys.indexOf(key)]
+                    let value = values[keys.indexOf(key)].toString()
+
+                    // Edge case for version strings (e.g. 0.1.2.3) which accidentally gets casted into a float
+                    if (value.match(/./g || []).length <= 1) {
+                        value = parseFloat(value) === NaN ? value : parseFloat(value)
+                    }
+
+                    cleaned[key.split(":")[1]] = value
                 }
         
                 reconstructed.push(cleaned)
             }
     
+            if (reconstructed.length == 1) {
+                reconstructed = reconstructed[0]
+            }
+
             body = reconstructed
         }
     }

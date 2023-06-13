@@ -12,7 +12,7 @@ rcctalk is a console application that can be installed by cloning the repository
 - `CloseAllJobs()` -> Closes every job on the connected RCCService instance
 - `Execute("sampleJobId123", "local a, b = ...; return b .. a;", ["spaghetti", "cook"])` -> Will return `cook spaghetti` assuming a job with ID `sampleJobId123` exists
 
-Optional arguments are denoted with a question mark and don't always have to be set, but if there are multiple optional arguments in a sequence then they must be inputted according to their order denoted in the help menu.
+Optional parameters are denoted with a question mark and don't always have to be set, but if there are multiple optional parameters in a sequence then they must be inputted according to their order denoted in the help menu.
 
 ## Eval
 rcctalk uses JavaScript's inbuilt `eval` function to parse operation parameters, allowing you to take advantage of JavaScript functions and utilize mathematical operators to achieve even more powerful access to RCCService. Here are some examples:

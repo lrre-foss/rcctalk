@@ -1,3 +1,5 @@
+import humanizeDuration from "humanize-duration"
+
 import net from "../net.js"
 import util from "../util.js"
 
@@ -21,7 +23,7 @@ export default {
         },
         handler: async () => {
             return {
-                data: await net.send([{ "Status": null }])
+                data: await net.send([{ "GetStatus": null }])
             }
         }
     },
@@ -41,12 +43,12 @@ export default {
                 required: false
             }
         },
-        handler: async (type, jobID) => {
+        handler: async (parameters) => {
             return {
                 data: await net.send([{
                     "Diag": {
-                        "type": type,
-                        "jobID": jobID
+                        "type": parameters.type,
+                        "jobID": parameters.jobID
                     }
                 }])
             }
@@ -87,21 +89,21 @@ export default {
                 default: []
             }
         },
-        handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
+        handler: async (parameters) => {
             return {
                 data: await net.send([{
                     "OpenJob": {
                         "job": {
-                            "id": jobID,
-                            "expirationInSeconds": expirationInSeconds,
-                            "category": category,
-                            "cores": cores
+                            "id": parameters.jobID,
+                            "expirationInSeconds": parameters.expirationInSeconds,
+                            "category": parameters.category,
+                            "cores": parameters.cores
                         },
                         
                         "script": {
                             "name": "Starter Script",
-                            "script": script,
-                            "arguments": data
+                            "script": parameters.script,
+                            "arguments": parameters.data
                         }
                     }
                 }])
@@ -143,21 +145,21 @@ export default {
                 default: []
             }
         },
-        handler: async (jobID, expirationInSeconds, category, cores, script, data) => {
+        handler: async (parameters) => {
             return {
                 data: await net.send([{
                     "BatchJob": {
                         "job": {
-                            "id": jobID,
-                            "expirationInSeconds": expirationInSeconds,
-                            "category": category,
-                            "cores": cores
+                            "id": parameters.jobID,
+                            "expirationInSeconds": parameters.expirationInSeconds,
+                            "category": parameters.category,
+                            "cores": parameters.cores
                         },
                         
                         "script": {
                             "name": "Starter Script",
-                            "script": script,
-                            "arguments": data
+                            "script": parameters.script,
+                            "arguments": parameters.data
                         }
                     }
                 }])
@@ -184,15 +186,15 @@ export default {
                 default: []
             }
         },
-        handler: async (jobID, script, data) => {
+        handler: async (parameters) => {
             return {
                 data: await net.send([{
                     "Execute": {
-                        "jobID": jobID,
+                        "jobID": parameters.jobID,
                         "script": {
                             "name": uuid(),
-                            "script": script,
-                            "arguments": data
+                            "script": parameters.script,
+                            "arguments": parameters.data
                         }
                     }
                 }])
@@ -211,11 +213,11 @@ export default {
                 required: true
             }
         },
-        handler: async (jobID, expirationInSeconds) => {
+        handler: async (parameters) => {
             return await net.send([{
                 "RenewLease": {
-                    "jobID": jobID,
-                    "expirationInSeconds": expirationInSeconds
+                    "jobID": parameters.jobID,
+                    "expirationInSeconds": parameters.expirationInSeconds
                 }
             }])
         }
@@ -229,9 +231,11 @@ export default {
             },
         },
         handler: async () => {
+            let response = await net.send([{ "GetExpiration": { "jobID": jobID } }])
+
             return {
-                message: `Expiration for job with jobID "${jobID}" is ${util.yellow("%d")} seconds (took ${util.green("%sms")})`,
-                data: await net.send([{ "GetExpiration": { "jobID": jobID } }])
+                message: `Expiration for job with jobID "${jobID}" is ${util.yellow("{0}")} seconds (approx. ${humanizeDuration(response)} from now)! (took ${util.green("{1}ms")})`,
+                data: response
             }
         }
     },
@@ -254,10 +258,12 @@ export default {
                 required: true
             },
         },
-        handler: async (jobID) => {
+        handler: async (parameters) => {
+            await net.send([{ "CloseJob": { "jobID": parameters.jobID } }])
+
             return {
-                message: `Succesfully closed job with ID "${jobID}"! (took ${util.green("%sms")})`,
-                data: await net.send([{ "CloseJob": { "jobID": jobID } }])
+                message: `Succesfully closed job with ID "{0}"! (took ${util.green("{1}ms")})`,
+                data: parameters.jobID
             }
         }
     },
@@ -265,7 +271,7 @@ export default {
         returns: "int",
         handler: async () => {
             return {
-                message: `Succesfully closed ${util.yellow("%d")} jobs! (took ${util.green("%sms")})`,
+                message: `Succesfully closed ${util.yellow("{0}")} jobs! (took ${util.green("{1}ms")})`,
                 data: await net.send([{ "CloseAllJobs": null }])
             }
         }
@@ -274,7 +280,7 @@ export default {
         returns: "int",
         handler: async () => {
             return {
-                message: `Succesfully closed ${util.yellow("%d")} expired jobs! (took ${util.green("%sms")})`,
+                message: `Succesfully closed ${util.yellow("{0}")} expired jobs! (took ${util.green("{1}ms")})`,
                 data: await net.send([{ "CloseExpiredJobs": null }])
             }
         }
