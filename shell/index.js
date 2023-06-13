@@ -120,7 +120,7 @@ async function feed() {
                         throw "Failed to evaluate parameters (not a valid array)"
                     }
 
-                    if (parameters.length != operations[method].parameters.length) {
+                    if (parameters.length < operations[method].parameters.length) {
                         let values = Object.values(operations[method].parameters)
                         let required = 0
 

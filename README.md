@@ -15,7 +15,7 @@ rcctalk is a console application that can be installed by cloning the repository
 Optional parameters are denoted with a question mark and don't always have to be set, but if there are multiple optional parameters in a sequence then they must be inputted according to their order denoted in the help menu.
 
 ## Eval
-rcctalk uses JavaScript's inbuilt `eval` function to parse operation parameters, allowing you to take advantage of JavaScript functions and utilize mathematical operators to achieve even more powerful access to RCCService. Here are some examples:
+rcctalk uses an extended sandboxed version of JavaScript's inbuilt `eval` function to parse operation parameters, allowing you to take advantage of JavaScript functions and utilize mathematical operators to achieve even more powerful access to RCCService. Here are some examples:
 - `Execute("sampleJobId123", "return " + Math.pow(6, 2))` -> Will return `36`
 - `Execute("sampleJobId123", fs.readFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
 
