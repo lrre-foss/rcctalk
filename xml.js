@@ -82,7 +82,7 @@ function generateOperationXml(operation) {
         if (typeof value === "object") {
             xml += key == "arguments" ? generateLuaArguments(value) : generateOperationXml(value)
         } else {
-            xml += value
+            xml += value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         }
 
         xml += `</ns1:${key}>`
