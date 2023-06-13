@@ -53,7 +53,7 @@ function evaluateParameters(parameters) {
         return []
     }
 
-    return _eval(`const fs=require("fs");const path=require("path");module.exports=[${parameters}]`, "ExecuteScript", null, true)
+    return _eval(`"use strict";const fs=require("fs");const path=require("path");module.exports=[${parameters}]`, "ExecuteScript", null, true)
 }
 
 async function feed() {

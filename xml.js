@@ -170,6 +170,10 @@ function parseEnvelope(envelope) {
         // TODO: Perhaps don't hardcode this? We can probably check if the type is a LuaValue[] in a better way.
         if (type == "OpenJob" || type == "Execute" || type == "BatchJob" || type == "Diag") {
             body = parseLuaValueXml(Object.values(body)[0])
+            
+            if (body.length == 1) {
+                body = body[0]
+            }
         } else {
             if (Object.values(body).length == 1) {
                 body = Object.values(body)[0]
