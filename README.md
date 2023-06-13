@@ -20,4 +20,20 @@ rcctalk uses an extended sandboxed version of JavaScript's inbuilt `eval` functi
 - `Execute("sampleJobId123", fs.readFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
 
 # License
-rcctalk is licensed under the GNU Affero General Public License v3.0. A copy of it [has been included](https://github.com/kiseki-lol/rcctalk/blob/trunk/LICENSE).
+```
+rcctalk - Powerful command line utility to communicate with RCCService instances
+Copyright (C) 2023  Kiseki <inbox@kiseki.lol>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+```
