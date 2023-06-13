@@ -20,4 +20,4 @@ rcctalk uses an extended sandboxed version of JavaScript's inbuilt `eval` functi
 - `Execute("sampleJobId123", fs.readFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
 
 # License
-Copyright (c) Kiseki 2023. All rights reserved.
+rcctalk is licensed under the GNU Affero General Public License v3.0. A copy of it [has been included](https://github.com/kiseki-lol/rcctalk/blob/trunk/LICENSE).
