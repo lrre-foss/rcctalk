@@ -53,7 +53,7 @@ function evaluateParameters(parameters) {
         return []
     }
 
-    return _eval(`fs=require("fs");path=require("path");module.exports=[${parameters}]`, "ExecuteScript", null, true)
+    return _eval(`const fs=require("fs");const path=require("path");module.exports=[${parameters}]`, "ExecuteScript", null, true)
 }
 
 async function feed() {
@@ -120,7 +120,7 @@ async function feed() {
                         throw "Failed to evaluate parameters (not a valid array)"
                     }
 
-                    if (parameters.length < operations[method].parameters.length) {
+                    if (parameters.length < Object.keys(operations[method].parameters).length) {
                         let values = Object.values(operations[method].parameters)
                         let required = 0
 
@@ -135,7 +135,7 @@ async function feed() {
                         }
 
                         for (let i = 0; i < values.length; i++) {
-                            if (values[i].required && !parameters[i]) {
+                            if (!values[i].required && !parameters[i]) {
                                 parameters[i] = values[i].default
                             }
                         }

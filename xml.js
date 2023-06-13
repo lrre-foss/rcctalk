@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser"
-
+import colorize from "json-colorizer"
 const template = 
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
     "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
@@ -104,7 +104,7 @@ function generateEnvelope(operations) {
 function getJsValueFromLuaXml(xml) {
     switch (xml["ns1:type"]) {
         case "LUA_TTABLE":
-            return parseLuaValueXml(Object.values(xml["ns1:table"]))
+            return parseLuaValueXml(xml["ns1:table"]["ns1:LuaValue"])
         case "LUA_TBOOLEAN":
             return xml["ns1:value"] == "true"
         case "LUA_TNUMBER":
@@ -119,30 +119,18 @@ function getJsValueFromLuaXml(xml) {
 }
 
 function parseLuaValueXml(value) {
-    let parsed
+    let result = null
 
-    if (!Array.isArray(value)) {
-        parsed = getJsValueFromLuaXml(value)
-    } else {
-        parsed = []
-
+    if (Array.isArray(value)) {
+        result = []
         for (let element of value) {
-            if (element.hasOwnProperty("ns1:value")) {
-                parsed.push(getJsValueFromLuaXml(element))
-            } else {
-                let table = Object.values(element["ns1:table"])[0]
-                let reconstructed = []
-    
-                for (let nested of table) {
-                    reconstructed.push(parseLuaValueXml(nested))
-                }
-    
-                parsed.push(reconstructed)
-            }
-        }   
+            result.push(getJsValueFromLuaXml(element))
+        }
+    } else {
+        result = [ getJsValueFromLuaXml(value) ]
     }
 
-    return parsed
+    return result
 }
 
 function parseEnvelope(envelope) {
@@ -221,6 +209,7 @@ function parseEnvelope(envelope) {
             }
         }
     } catch (e) {
+        throw e
         response.error = `Failed to parse response - ${e}`
         return response
     }
