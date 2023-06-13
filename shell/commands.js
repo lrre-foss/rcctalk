@@ -8,7 +8,7 @@ import util from "../util.js"
 const commands = {
     "connect": {
         description: "connect to a RCCService instance at the specified hostname (default port: 64989)",
-        parameters: ["ip"],
+        parameters: ["hostname"],
         handler: async (parameters) => {
             if (net.isConnected()) {
                 console.log(`${util.red("Error:")} Please disconnect before connecting to another RCCService instance!`)
@@ -18,7 +18,7 @@ const commands = {
             let hostname = net.sanitizeHostname(parameters[0])
 
             if (hostname === null) {
-                console.log(`${util.red("Invalid hostname!")} Please pass a valid IPv4 address (e.g. "127.0.0.1") or a hostname to connect to a RCCService instance at 127.0.0.1 with port 64989, or manually set the SOAP port with a colon (e.g. "127.0.0.1:12345").`)
+                console.log(`${util.red("Invalid hostname!")} Please input a valid IPv4 address (e.g. "127.0.0.1") or a hostname to connect to a RCCService instance at 127.0.0.1 with port 64989, or manually set the SOAP port with a colon (e.g. "127.0.0.1:12345").`)
                 return
             }
 
