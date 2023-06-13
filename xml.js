@@ -1,7 +1,7 @@
 import { XMLParser } from "fast-xml-parser"
 
 const template = 
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
     "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ns1=\"http://roblox.com/\" xmlns:ns2=\"http://roblox.com/RCCServiceSoap\" xmlns:ns3=\"http://roblox.com/RCCServiceSoap12\">" +
     "<SOAP-ENV:Body>" +
     "{{body}}" +
@@ -167,50 +167,62 @@ function parseEnvelope(envelope) {
         return response
     }
 
-    body = Object.values(body)[0]
+    try
+    {
+        body = Object.values(body)[0]
 
-    let type = Object.keys(body)[0].split(":")[1].replace("Result", "")
-
-    // TODO: Perhaps don't hardcode this? We can probably check if the type is a LuaValue[] in a better way.
-    if (type == "OpenJob" || type == "Execute" || type == "BatchJob" || type == "Diag") {
-        body = parseLuaValueXml(Object.values(body)[0])
-    } else {
-        if (Object.values(body).length == 1) {
-            body = Object.values(body)[0]
+        if (!body) {
+            response.data = null
+            response.success = true
+            return response
         }
-    
-        if (typeof body === "object") {
-            let reconstructed = []
 
-            if (!Array.isArray(body)) {
-                body = [body]
+        let type = Object.keys(body)[0].split(":")[1].replace("Result", "")
+    
+        // TODO: Perhaps don't hardcode this? We can probably check if the type is a LuaValue[] in a better way.
+        if (type == "OpenJob" || type == "Execute" || type == "BatchJob" || type == "Diag") {
+            body = parseLuaValueXml(Object.values(body)[0])
+        } else {
+            if (Object.values(body).length == 1) {
+                body = Object.values(body)[0]
             }
-    
-            for (let element of body) {
-                let keys = Object.keys(element)
-                let values = Object.values(element)
-                let cleaned = {}
         
-                for (let key of keys) {
-                    let value = values[keys.indexOf(key)].toString()
-
-                    // Edge case for version strings (e.g. 0.1.2.3) which accidentally gets casted into a float
-                    if (value.match(/./g || []).length <= 1) {
-                        value = parseFloat(value) === NaN ? value : parseFloat(value)
-                    }
-
-                    cleaned[key.split(":")[1]] = value
+            if (typeof body === "object") {
+                let reconstructed = []
+    
+                if (!Array.isArray(body)) {
+                    body = [body]
                 }
         
-                reconstructed.push(cleaned)
-            }
+                for (let element of body) {
+                    let keys = Object.keys(element)
+                    let values = Object.values(element)
+                    let cleaned = {}
+            
+                    for (let key of keys) {
+                        let value = values[keys.indexOf(key)].toString()
     
-            if (reconstructed.length == 1) {
-                reconstructed = reconstructed[0]
+                        // Edge case for version strings (e.g. 0.1.2.3) which accidentally gets casted into a float
+                        if (value.match(/./g || []).length <= 1) {
+                            value = parseFloat(value) === NaN ? value : parseFloat(value)
+                        }
+    
+                        cleaned[key.split(":")[1]] = value
+                    }
+            
+                    reconstructed.push(cleaned)
+                }
+        
+                if (reconstructed.length == 1) {
+                    reconstructed = reconstructed[0]
+                }
+    
+                body = reconstructed
             }
-
-            body = reconstructed
         }
+    } catch (e) {
+        response.error = `Failed to parse response - ${e}`
+        return response
     }
 
     response.success = true

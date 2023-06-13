@@ -1,4 +1,5 @@
 import humanizeDuration from "humanize-duration"
+import { v4 as uuid } from "uuid"
 
 import net from "../net.js"
 import util from "../util.js"
@@ -64,6 +65,15 @@ export default {
                 type: "string",
                 required: true
             },
+            "script": {
+                type: "string",
+                required: true
+            },
+            "arguments": {
+                type: "array",
+                required: false,
+                default: []
+            },
             "expirationInSeconds": {
                 type: "double",
                 required: false,
@@ -78,15 +88,6 @@ export default {
                 type: "int",
                 required: false,
                 default: 1
-            },
-            "script": {
-                type: "string",
-                required: true
-            },
-            "arguments": {
-                type: "array",
-                required: false,
-                default: []
             }
         },
         handler: async (parameters) => {
@@ -103,7 +104,7 @@ export default {
                         "script": {
                             "name": "Starter Script",
                             "script": parameters.script,
-                            "arguments": parameters.data
+                            "arguments": parameters.arguments
                         }
                     }
                 }])
@@ -120,6 +121,15 @@ export default {
                 type: "string",
                 required: true
             },
+            "script": {
+                type: "string",
+                required: true
+            },
+            "arguments": {
+                type: "array",
+                required: false,
+                default: []
+            },
             "expirationInSeconds": {
                 type: "double",
                 required: false,
@@ -134,15 +144,6 @@ export default {
                 type: "int",
                 required: false,
                 default: 1
-            },
-            "script": {
-                type: "string",
-                required: true
-            },
-            "arguments": {
-                type: "array",
-                required: false,
-                default: []
             }
         },
         handler: async (parameters) => {
@@ -159,7 +160,7 @@ export default {
                         "script": {
                             "name": "Starter Script",
                             "script": parameters.script,
-                            "arguments": parameters.data
+                            "arguments": parameters.arguments
                         }
                     }
                 }])
@@ -194,7 +195,7 @@ export default {
                         "script": {
                             "name": uuid(),
                             "script": parameters.script,
-                            "arguments": parameters.data
+                            "arguments": parameters.arguments
                         }
                     }
                 }])
@@ -230,11 +231,11 @@ export default {
                 required: true
             },
         },
-        handler: async () => {
-            let response = await net.send([{ "GetExpiration": { "jobID": jobID } }])
+        handler: async (parameters) => {
+            let response = await net.send([{ "GetExpiration": { "jobID": parameters.jobID } }])
 
             return {
-                message: `Expiration for job with jobID "${jobID}" is ${util.yellow("{0}")} seconds (approx. ${humanizeDuration(response)} from now)! (took ${util.green("{1}ms")})`,
+                message: `Expiration for job with jobID "${parameters.jobID}" is ${util.yellow("{0}")} seconds (approx. ${humanizeDuration(Math.floor(response) * 1000)} from now)! (took ${util.green("{1}ms")})`,
                 data: response
             }
         }

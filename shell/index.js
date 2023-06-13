@@ -1,5 +1,6 @@
 import readline from "node:readline"
 
+import _eval from "eval"
 import colorize from "json-colorizer"
 import format from "string-format"
 import ora from "ora"
@@ -10,11 +11,6 @@ import operations from "./operations.js"
 import app from "../app.js"
 import net from "../net.js"
 import util from "../util.js"
-
-// These modules are never used within this file, but we import them anyways so that users may easily access them from the shell.
-import fs from "node:fs"
-import path from "node:path"
-import fetch from "node-fetch"
 
 const logo = "              _        _ _    " +
       "\n" + "             | |      | | |   " +
@@ -56,10 +52,13 @@ function evaluateParameters(parameters) {
     if (!parameters.length) {
         return []
     }
+
+    return _eval(`fs=require("fs");path=require("path");module.exports=[${parameters}]`, "ExecuteScript", null, true)
 }
 
 async function feed() {
     io.question(`${net.isConnected() ? util.yellow(net.getFormattedHostname()) : ""}> `, async (input) => {
+        input = input.trim()
         let method = ""
 
         for (let char of input) {
@@ -68,11 +67,6 @@ async function feed() {
             } else {
                 break
             }
-        }
-
-        if (method == "") {
-            feed()
-            return
         }
 
         if (commands.hasOwnProperty(method)) {
@@ -107,26 +101,57 @@ async function feed() {
             }
 
             // Get the operation parameters
-            let parameters
-            try {
-                let thereafter = input.slice(method.length).trim()
+            let parameters = null
 
-                if (thereafter.length < 2) {
-                    throw "No parameters in input"
-                }
+            if (operations[method].hasOwnProperty("parameters")) {
+                try {
+                    let thereafter = input.slice(method.length).trim()
 
-                if (!thereafter.startsWith("(") || !thereafter.endsWith(")")) {
-                    throw "Improperly formatted parameters (one or more surrounding paranthesis missing); expected format: Operation(param1, param2, ...)"
-                }
+                    if (thereafter.length < 2) {
+                        throw "No parameters in input"
+                    }
 
-                parameters = evaluateParameters(thereafter.slice(1, thereafter.length - 1))
-                if (parameters === null) {
-                    throw `Failed to evaluate parameters: ${parameters}`
+                    if (!thereafter.startsWith("(") || !thereafter.endsWith(")")) {
+                        throw "Improperly formatted parameters; expected format: Operation(param1, param2, ...)"
+                    }
+                    
+                    parameters = evaluateParameters(thereafter.slice(1, thereafter.length - 1))
+                    if (!Array.isArray(parameters)) {
+                        throw "Failed to evaluate parameters (not a valid array)"
+                    }
+
+                    if (parameters.length != operations[method].parameters.length) {
+                        let values = Object.values(operations[method].parameters)
+                        let required = 0
+
+                        for (let i = 0; i < values.length; i++) {
+                            if (values[i].required) {
+                                required++
+                            }
+                        }
+
+                        if (parameters.length < required) {
+                            throw `Too few parameters (expected ${required}, got ${parameters.length})`
+                        }
+
+                        for (let i = 0; i < values.length; i++) {
+                            if (values[i].required && !parameters[i]) {
+                                parameters[i] = values[i].default
+                            }
+                        }
+                    }
+
+                    let structured = {}
+                    for (let i = 0; i < parameters.length; i++) {
+                        structured[Object.keys(operations[method].parameters)[i]] = parameters[i]
+                    }
+
+                    parameters = structured
+                } catch (e) {
+                    console.log(`${util.red("Error:")} ${e}`)
+                    feed()
+                    return
                 }
-            } catch (e) {
-                console.log(`${util.red("Error:")} ${e}`)
-                feed()
-                return
             }
 
             let spinner = ora(`Sending...`)
@@ -146,11 +171,14 @@ async function feed() {
             let message = typeof response === "object" ? (response.hasOwnProperty("message") ? response.message : null) : null
             let data = typeof response === "object" ? response.data : response
 
-            if (typeof data === "object") {
+            if (typeof data === "object" && data !== null) {
                 message = format(`RCCService responded with the following data! (took ${util.green("{0}ms")})`, elapsed)
 
                 spinner.succeed(message)
                 console.log(colorize(data, { pretty: true }))
+            } else if (data === null) {
+                message = format(`Successfully ran operation in ${util.green("{0}ms")}!`, elapsed)
+                spinner.succeed(message)
             } else {
                 message = format(message === null ? `RCCService responded with "{0}" in ${util.green("{1}ms")}!` : message, data, elapsed)
                 spinner.succeed(message)

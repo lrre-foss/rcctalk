@@ -10,7 +10,7 @@ rcctalk is a console application that can be installed by cloning the repository
 ## Example operations
 - `OpenJob("sampleJobId123", "return 'Hello world!'")` -> Opens a job and returns `Hello world!`
 - `CloseAllJobs()` -> Closes every job on the connected RCCService instance
-- `Execute("sampleJobId123", "local a, b = ...; return b .. a;", ["spaghetti", "cook"])` -> Will return `cook spaghetti` assuming a job with ID `sampleJobId123` exists
+- `Execute("sampleJobId123", "local a, b = ...; return b .. " " .. a;", ["spaghetti", "cook"])` -> Will return `cook spaghetti` assuming a job with ID `sampleJobId123` exists
 
 Optional parameters are denoted with a question mark and don't always have to be set, but if there are multiple optional parameters in a sequence then they must be inputted according to their order denoted in the help menu.
 
