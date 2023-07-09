@@ -1,5 +1,5 @@
 {
-  "name": "@kiseki-lol/rcctalk",
+  "name": "@lrre-foss/rcctalk",
   "version": "1.0.0",
   "description": "RCCService communication utility",
   "type": "module",
@@ -8,20 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kiseki-lol/rcctalk.git"
+    "url": "git+https://github.com/lrre-foss/rcctalk.git"
   },
-  "contributors": [
-    {
-      "name": "rjindael",
-      "email": "me@rjindael.xyz",
-      "url": "https://rjindael.xyz/"
-    }
-  ],
-  "license": "AGPL-3.0-only",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kiseki-lol/rcctalk/issues"
+    "url": "https://github.com/lrre-foss/rcctalk/issues"
   },
-  "homepage": "https://github.com/kiseki-lol/rcctalk#readme",
+  "homepage": "https://github.com/lrre-foss/rcctalk#readme",
   "dependencies": {
     "chalk": "^5.2.0",
     "commander": "^10.0.1",

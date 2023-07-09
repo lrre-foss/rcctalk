@@ -2,7 +2,7 @@
 Powerful command line utility to communicate with RCCService instances
 
 # Screenshot
-![](https://github.com/kiseki-lol/rcctalk/raw/trunk/screenshot.png)
+![](https://github.com/lrre-foss/rcctalk/raw/trunk/screenshot.png)
 
 # Usage
 rcctalk is a console application that can be installed by cloning the repository and then running the command `npm i -g` to install it system-wide. You can then easily open the rcctalk shell from the command line by entering `rcctalk`. For further instructions, please run `rcctalk --help` or type `help` into the shell.
@@ -20,20 +20,4 @@ rcctalk uses an extended sandboxed version of JavaScript's inbuilt `eval` functi
 - `Execute("sampleJobId123", fs.readFileSync("c:\\gameserver.txt"))` -> Will read from `c:\gameserver.txt` and send that script to RCCService
 
 # License
-```
-rcctalk - Powerful command line utility to communicate with RCCService instances
-Copyright (C) 2023  Kiseki <inbox@kiseki.lol>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-```
+rcctalk is licensed under the [MIT license](https://github.com/lrre-foss/rcctalk/blob/trunk/LICENSE). A copy of it has been included with rcctalk.
