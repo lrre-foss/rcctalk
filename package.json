@@ -17,7 +17,7 @@
   "homepage": "https://github.com/lrre-foss/rcctalk#readme",
   "dependencies": {
     "chalk": "^5.2.0",
-    "commander": "^10.0.1",
+    "commander": "^11.0.0",
     "eval": "^0.1.8",
     "fast-xml-parser": "^4.2.5",
     "humanize-duration": "^3.28.0",
