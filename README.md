@@ -1,4 +1,7 @@
 # rcctalk
+[![License](https://img.shields.io/github/license/lrre-foss/rcctalk)](https://github.com/lrre-foss/rcctalk/blob/trunk/LICENSE)
+[![Star](https://img.shields.io/github/stars/lrre-foss/rcctalk?style=social)](https://github.com/lrre-foss/rcctalk/stargazers)
+
 Powerful command line utility to communicate with RCCService instances
 
 # Screenshot
