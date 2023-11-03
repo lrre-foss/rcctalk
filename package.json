@@ -27,6 +27,6 @@
     "ora": "^7.0.1",
     "string-format": "^2.0.0",
     "uuid": "^9.0.1",
-    "xml-formatter": "^3.5.0"
+    "xml-formatter": "^3.6.0"
   }
 }
