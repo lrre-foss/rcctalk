@@ -64,7 +64,7 @@ function sanitizeHostname(hostname) {
 }
 
 function formatHostname(hostname) {
-    return hostname.ip + (hostname.port == 64989 ? "" : ":" + port)
+    return hostname.ip + (hostname.port == 64989 ? "" : ":" + hostname.port)
 }
 
 function getFormattedHostname() {
