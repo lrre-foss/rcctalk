@@ -36,6 +36,8 @@ function startup() {
     console.log(`${util.blue(app.url)}\n`)
 
     console.log(`Type ${util.cyan("help")} to get started`)
+
+    util.setTerminalTitle("rcctalk")
 }
 
 async function open(options) {

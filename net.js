@@ -108,11 +108,14 @@ async function connect(ip, port) {
 
     hostname = { ip, port }
 
+    util.setTerminalTitle(`rcctalk - ${getFormattedHostname()}`)
+
     return true
 }
 
 function disconnect() {
     hostname = { ip: null, port: null }
+    util.setTerminalTitle("rcctalk")
 }
 
 async function send(data) {
