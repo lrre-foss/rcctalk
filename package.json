@@ -19,14 +19,14 @@
     "chalk": "^5.2.0",
     "commander": "^11.0.0",
     "eval": "^0.1.8",
-    "fast-xml-parser": "^4.2.5",
-    "humanize-duration": "^3.29.0",
+    "fast-xml-parser": "^4.3.2",
+    "humanize-duration": "^3.30.0",
     "is-valid-hostname": "^1.0.2",
     "json-colorizer": "^2.2.2",
-    "node-fetch": "^3.3.1",
-    "ora": "^6.3.1",
+    "node-fetch": "^3.3.2",
+    "ora": "^7.0.1",
     "string-format": "^2.0.0",
-    "uuid": "^9.0.0",
-    "xml-formatter": "^3.4.1"
+    "uuid": "^9.0.1",
+    "xml-formatter": "^3.5.0"
   }
 }
