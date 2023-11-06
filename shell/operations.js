@@ -246,8 +246,10 @@ export default {
             type: "Job[]"
         },
         handler: async () => {
+            let response = await net.send([{ "GetAllJobs": null }])
+
             return {
-                data: await net.send([{ "GetAllJobs": null }])
+                data: response === null ? [] : response
             }
         }
     },
