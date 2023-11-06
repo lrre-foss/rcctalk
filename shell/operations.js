@@ -215,12 +215,17 @@ export default {
             }
         },
         handler: async (parameters) => {
-            return await net.send([{
+            await net.send([{
                 "RenewLease": {
                     "jobID": parameters.jobID,
                     "expirationInSeconds": parameters.expirationInSeconds
                 }
             }])
+            
+            return {
+                message: `Succesfully set expiration to ${util.yellow("{0}")} seconds from now! (took ${util.green("{1}ms")})`,
+                data: parameters.expirationInSeconds
+            }
         }
     },
     "GetExpiration": {
@@ -232,10 +237,10 @@ export default {
             },
         },
         handler: async (parameters) => {
-            let response = await net.send([{ "GetExpiration": { "jobID": parameters.jobID } }])
+            let response = Math.floor(await net.send([{ "GetExpiration": { "jobID": parameters.jobID } }]))
 
             return {
-                message: `Expiration for job with jobID "${parameters.jobID}" is ${util.yellow("{0}")} seconds (approx. ${humanizeDuration(Math.floor(response) * 1000)} from now)! (took ${util.green("{1}ms")})`,
+                message: `Job "${parameters.jobID}" expires ${util.yellow("{0}sec")} (approx. ${humanizeDuration(Math.floor(response) * 1000)}) from now! (took ${util.green("{1}ms")})`,
                 data: response
             }
         }
@@ -247,6 +252,11 @@ export default {
         },
         handler: async () => {
             let response = await net.send([{ "GetAllJobs": null }])
+
+            // Odd edge-case for when there's only one job
+            if (!Array.isArray(response) && response !== null) {
+                response = [ response ]
+            }
 
             return {
                 data: response === null ? [] : response
