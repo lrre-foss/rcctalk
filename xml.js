@@ -102,20 +102,22 @@ function generateEnvelope(operations) {
 }
 
 function getJsValueFromLuaXml(xml) {
-    switch (xml["ns1:type"]) {
-        case "LUA_TTABLE":
-            return parseLuaValueXml(xml["ns1:table"]["ns1:LuaValue"])
-        case "LUA_TBOOLEAN":
-            return xml["ns1:value"] == "true"
-        case "LUA_TNUMBER":
-            return Number(xml["ns1:value"])
-        case "LUA_TSTRING":
-            return xml["ns1:value"]
-        case "LUA_TNIL":
-            return null
-        default:
-            return xml["ns1:value"]
+    if (xml["ns1:type"] === "LUA_TTABLE") {
+        return parseLuaValueXml(xml["ns1:table"]["ns1:LuaValue"])
     }
+    if (xml["ns1:type"] === "LUA_TBOOLEAN") {
+        return xml["ns1:value"] == "true"
+    }
+    if (xml["ns1:type"] === "LUA_TNUMBER") {
+        return Number(xml["ns1:value"])
+    }
+    if (xml["ns1:type"] === "LUA_TSTRING") {
+        return xml["ns1:value"]
+    }
+    if (xml["ns1:type"] === "LUA_TNIL") {
+        return null
+    }
+    return xml["ns1:value"]
 }
 
 function parseLuaValueXml(value) {
@@ -124,6 +126,11 @@ function parseLuaValueXml(value) {
     if (Array.isArray(value)) {
         result = []
         for (let element of value) {
+            if (element["ns1:type"] === "LUA_TTABLE" && !element["ns1:table"].hasOwnProperty("ns1:LuaValue")) {
+                // weird edge case where the table is empty
+                continue
+            }
+
             result.push(getJsValueFromLuaXml(element))
         }
     } else {
