@@ -24,7 +24,7 @@
     "is-valid-hostname": "^1.0.2",
     "json-colorizer": "^2.2.2",
     "node-fetch": "^3.3.2",
-    "ora": "^7.0.1",
+    "ora": "^8.0.1",
     "string-format": "^2.0.0",
     "uuid": "^9.0.1",
     "xml-formatter": "^3.6.0"
